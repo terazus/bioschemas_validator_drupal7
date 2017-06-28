@@ -94,6 +94,7 @@ div.json_display{
 
 table.bioschemas_validation{
 	width:100%;
+	border-collapse: collapse;
 }
 
 div.bs_output tr.table_line{
