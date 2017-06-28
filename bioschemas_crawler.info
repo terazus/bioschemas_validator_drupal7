@@ -1,0 +1,8 @@
+name = Bioschemas Crawler and Validator
+description = This module will crawl the given page markup up with Bioschemas and validate the markup. Is also create the drupal corresponding objects on www.france-bioinformatique.fr
+core = 7.x
+version = 1.0
+package = crawlers
+files[] = bioschemas_crawler.module
+
+stylesheets[all][] = crawler.css

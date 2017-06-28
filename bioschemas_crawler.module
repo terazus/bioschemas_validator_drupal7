@@ -1,0 +1,251 @@
+<?php
+
+/**
+* 
+* 	@author 	Terazus <batistadominique@hotmail.com>
+* 	CREATION DATE: 30 Mai 2017
+* 	LAST UPDATE:  1 juin 2016(by Terazus)
+*/
+
+
+// TODO: as some point enable microdata parsing?
+
+require_once 'easyrdf/lib/EasyRdf.php';
+require_once 'easyrdf/vendor/autoload.php';
+require_once 'classes/toolProcessor.php';
+
+function bioschemas_crawler_menu(){
+	$items['bioschemas_crawler'] = array( 
+			'title' => t('Bioschemas structured data testing tool'), 
+			'page callback' => 'bioschemas_crawler_page', 
+			'access callback' => TRUE, 
+			//'access arguments' => array(0),
+			);
+
+	return $items;
+}
+
+function bioschemas_crawler_page($form, &$form_state){
+	$form = drupal_get_form('bioschemas_crawler_form');
+	return $form;	
+}
+
+function bioschemas_crawler_form($form, &$form_state){
+
+	
+	$header_text = make_header();
+
+	$_SESSION['myresult'] = NULL;
+
+	$target_url = $_GET['url'];
+	$target_method = $_GET['format'];
+
+	$form['header'] = array(
+    		'#markup' => $header_text,
+  	);
+
+	$form['target_url'] = array(
+			'#type' => 'textfield',
+			'#title' => t("Select target URL"),
+			'#default_value' => "https://",
+			'#required' => TRUE,
+			'#default_value' => $target_url,
+	);
+
+	$form['target_format'] = array(
+			'#title' => t("Select format of your input markup"),
+			'#type' => 'select',
+			'#options' => array(
+						'jsonld'=>t('JSON-LD'),
+						'rdfa'=>t('RDFA'), 
+						'microdata'=>t('Microdata')),
+			'#required' => TRUE,
+			'#default_value' => $target_method,
+	);
+
+	$form['submit'] = array(
+			'#type' => 'submit',
+			'#value' => t("Submit query"),
+			'#suffix' =>  '</div>',
+	);
+
+
+
+
+	if ($form_state['submitted']==TRUE){
+		$form['result'] = array(
+			'#markup' => display_result($form_state),
+		);
+	}
+
+
+	return $form;
+}
+
+function prepare_json($json_input){
+	$new_json = array();
+
+	// for each item in the json (relinking data together)
+	foreach ($json_input as $item=>$item_fields){
+
+
+		$new_json[$item_fields->{'@id'}] = $item_fields;
+
+		// for each field of the current item
+		foreach ($item_fields as $field_name=>$field_value){
+			if (gettype($field_value) == 'array'){
+				if ($field_name == '@type'){
+					$new_json[$item_fields->{'@id'}]->{$field_name} = $field_value[0];
+				}
+				else{
+					if (isset($field_value[0]->{'@id'})){
+						$new_json[$item_fields->{'@id'}]->{$field_name} = $field_value[0]->{'@id'};
+					}
+					elseif(isset($field_value[0]->{'@value'})){
+						$new_json[$item_fields->{'@id'}]->{$field_name} = $field_value[0]->{'@value'};
+					}
+				}
+			}
+		}
+	}
+	return $new_json;	
+}
+
+function prepare_subjson($myjson, $sub_json){
+	$new_json = new stdClass;
+
+	foreach($sub_json as $sub_field=>$sub_value){
+		$new_field = str_replace('http://schema.org/', '', $sub_field);
+		if ($new_field == 'url'){
+			$new_json->{$new_field} = $sub_value->{'@id'};
+		}
+
+		else{
+			if(gettype($sub_value)=='object'){
+				$new_subjson = new stdClass;
+				$new_subjson->{"@type"} = str_replace('http://schema.org/','', $myjson[$sub_value->{'@id'}]->{'@type'});
+				
+				$ite = 0;
+				foreach($myjson[$sub_value->{'@id'}] as $subfield_name=>$subfield_value){
+					if($ite>1){
+						$subfield_name =  str_replace('http://schema.org/','', $subfield_name);
+						
+						if (gettype($subfield_value)=='object'){
+							if (isset($myjson[$subfield_value->{'@id'}])){
+								//rewrite that line to have other subfields included
+								$new_subjson->{$subfield_name} = $myjson[$subfield_value->{'@id'}]->{'http://schema.org/additionalType'};
+							}
+						}
+						else{
+							$new_subjson->{$subfield_name} = $subfield_value->{'@id'};
+						}		}
+					$ite++;
+				}
+				$new_json->{$new_field} = $new_subjson;
+			}
+			else{
+				$new_json->{$new_field} = $sub_value;
+			}					
+		}
+	}
+
+	return $new_json;
+}
+
+function display_result(&$form_state){
+
+	$message = '<div> <HR>';
+
+	if($form_state['input']['target_format']=='rdfa'){
+		$json_input = new EasyRdf_Graph($form_state['input']['target_url']);
+		$json_input->load();
+		$options = array('compact'=>true);
+		$serialiser = new EasyRdf_Serialiser_JsonLd();
+		$myjson = json_decode($serialiser->serialise($json_input, 'jsonld', $options));
+		$myjson = prepare_json($myjson->{'@graph'});
+
+		foreach($myjson as $sub_json){
+			$new_json = prepare_subjson($myjson, $sub_json);			
+			if ($new_json->{'@type'} == 'http://schema.org/SoftwareApplication'){
+				$tool = new toolProcessor($new_json);
+				$message .= "<div class='bs_output'>".$tool->message_output."</div>";
+				dpm($new_json);
+				$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+			}
+		}
+	}
+
+	else{
+		$context = stream_context_create(array('http' => array('ignore_errors' => true)));
+		$html = file_get_contents($form_state['input']['target_url'], false, $context);
+		$dom = new DOMDocument();
+		libxml_use_internal_errors( 1 );
+		$dom->loadHTML( $html );
+		$xpath = new DOMXpath( $dom );
+
+		$script = $dom->getElementsByTagName( 'script' );
+		$script = $xpath->query( '//script[@type="application/ld+json"]' );
+		foreach ($script as $item) {		
+			$json = $item->nodeValue;
+			//foreach (json_decode($json) as $item){
+				//dpm($item);
+				// Use to loop to get all the items in the json before testing the presence or absence of the @graph attribute.
+			//}
+			if (isset(json_decode($json)->{'@graph'})){
+				foreach (json_decode($json)->{'@graph'} as $newtool){
+					$tool = new toolProcessor($newtool);
+					//dpm($tool);
+					$message .= "<div class='bs_output'>".$tool->message_output."</div>";
+					$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode(json_decode($json)->{'@graph'}, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+				}
+
+			}
+			
+
+			else{
+				$tool = new toolProcessor(json_decode($json));
+				//dpm($tool);
+				$message .= "<div class='bs_output'>".$tool->message_output."</div>";
+				$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.$json.'</pre></div>';
+			}
+		}
+
+	}
+
+	return $message."</div>";
+}
+
+
+function bioschemas_crawler_form_submit($form, &$form_state){
+	$form_state['submitted'] = TRUE;
+	$form_state['rebuild'] = TRUE;
+}
+
+
+function make_header(){
+	global $base_url;
+	return "";
+	/*"
+	<div class='header' style='border:1px solid #ccc; padding:10px;'>
+		<p> To start using the crawler you can either: </p>
+		<ul style='padding:0px 5px 0px 20px;'>
+			<li> Fill the form below by providing the target URL and the input format </li>
+			<li> Provide the target url and input format using the API: <BR>
+				<div style='text-align:center;'> ".$base_url."/bioschemas_crawler?url=myURL&format=inputFormat </div> 
+				<i style='font-size:12px;'>(e.g.".$base_url."/bioschemas_crawler?url=https://www.france-bioinformatique.fr/en/evenements_upcoming&format=rdfa) </i>
+			</li>
+		</ul>
+	</div>
+	<div style='border:1px solid red;padding:10px;margin-top:15px;'> 
+	";*/
+}
+
+
+?>
+
+
+
+
+
+
+

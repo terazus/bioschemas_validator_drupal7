@@ -1,0 +1,157 @@
+div.main-container{
+	width:100%;
+}
+
+div#page{
+	min-height: 100vh;
+}
+
+div#main-wrapper{
+	min-height:71vh;
+}
+
+div#content{
+	padding:0px;
+	width:100% !important;
+	display:inline-block;
+}
+
+div.section{
+	padding:0px !important;
+}
+
+form#bioschemas-crawler-form{
+	width: 100%;
+	padding:0px;
+}
+
+form#bioschemas-crawler-form label{
+	display:none;
+}
+
+form#bioschemas-crawler-form select, 
+form#bioschemas-crawler-form input{
+	width: 100%;
+	height:60px;
+	border-radius:0px;
+	font-size: 22px;
+}
+
+form#bioschemas-crawler-form select{
+	position:relative;
+	border-radius: 0px;
+	left:1px;
+}
+
+form#bioschemas-crawler-form button{
+	width: 15%;
+	border-radius: 0px;
+	height: 60px;
+	margin: 0px;
+	padding: 0px;
+	position: relative;
+    top: -4px;
+    left: 2px;
+    font-size: 22px;
+}
+
+form#bioschemas-crawler-form div.form-item-target-url{
+	width:70%;
+	display:inline-block;
+}
+
+form#bioschemas-crawler-form div.form-item-target-format{
+	width:15%;
+	display:inline-block;
+}
+
+div.bs_output{
+	margin-top: 20px;
+	width:40%;
+	display: inline-block;
+	vertical-align: top;
+	font-size:16px;
+}
+
+div.json_display pre{
+	overflow: auto;
+ 	word-wrap: normal;
+  	white-space: pre;
+}
+
+div.json_display{
+	width:59%;
+	display: inline-block;
+	vertical-align: top;
+	border:1px solid #ccc;
+	margin-left:1%;
+	padding:20px;
+	margin-top:20px;
+}
+
+
+/*      */
+
+table.bioschemas_validation{
+	width:100%;
+}
+
+div.bs_output tr.table_line{
+	border:1px solid #ccc;
+	border-top:0px;
+	width:98%;
+	padding-left:10px;
+	padding-right:10px;
+}
+
+div.bs_output tr.table_line:hover{
+	background-color: #ccc;
+}
+
+div.bs_output tr.first_line{
+	border:1px solid #ccc;
+	padding:5px 15px 5px 15px;
+	height:40px;
+}
+
+div.bs_output tr.table_line td.first_col{
+	width:20px;
+	padding-left: 5px;
+}
+
+div.bs_output tr.table_line td.field_name{
+	width:300px;
+	font-weight: bold;
+	vertical-align: top;
+}
+
+div.bs_output tr.table_line td.field_value{
+	width:500px;
+	vertical-align: top;
+}
+
+div.bs_output td.fa-check-circle{
+	color:green;
+	background-color: transparent;
+	margin-right: 5px;
+}
+
+div.bs_output td.fa-exclamation-triangle{
+	color:orange;
+	background-color: transparent;
+	margin-right: 5px;
+}
+
+div.bs_output td.fa-times-circle{
+	color:red;
+	background-color: transparent;
+	margin-right: 5px;
+}
+
+div.bs_output td.error_field{
+	color:red;
+}
+
+div.bs_output td.field_warning{
+	color:orange;
+}
