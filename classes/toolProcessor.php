@@ -132,7 +132,7 @@ class toolProcessor extends stdClass{
 		$output = '';
 		$padding = 20*$level;
 		
-		if (gettype($subfield_value)!='array'){
+		if (gettype($field_value)!='array'){
 			$output.= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:'.$padding.'px" class="field_name">'.$field_name.'</td> </tr>';
 			$padding = $padding+20;
 			foreach ($field_value as $subfield_name=>$subfield_value){
