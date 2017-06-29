@@ -194,8 +194,8 @@ function display_result(&$form_state){
 			if (isset(json_decode($json)->{'@graph'})){
 				foreach (json_decode($json)->{'@graph'} as $newtool){
 					$tool = new toolProcessor($newtool);
-					//dpm($tool);
-					$message .= "<div class='bs_output'>".$tool->message_output."</div>";
+					$insert_message = $tool->make_table();
+					$message .= "<div class='bs_output'>".$insert_message."</div>";
 					$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode(json_decode($json)->{'@graph'}, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
 				}
 
@@ -205,7 +205,8 @@ function display_result(&$form_state){
 			else{
 				$tool = new toolProcessor(json_decode($json));
 				//dpm($tool);
-				$message .= "<div class='bs_output'>".$tool->message_output."</div>";
+				$insert_message = $tool->make_table();
+				$message .= "<div class='bs_output'>".$insert_message."</div>";
 				$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.$json.'</pre></div>';
 			}
 		}

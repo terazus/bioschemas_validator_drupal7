@@ -28,13 +28,17 @@ class toolProcessor extends stdClass{
 			$this->template_fields = get_template($json->{"@type"});
 			if ($this->template_fields!=null){
 				$result = $this->validate_json($this->values);
-				$this->message_output = '<table class="bioschemas_validation"><tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th></th> </tr>'.$result.'</table>';
+				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th></th> </tr>'.$result;
 			}
 			else{
 				$result = $this->validate_json($this->values);
-				$this->message_output = '<table class="bioschemas_validation"><tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.' (UNSUPPORTED OBJECT) </th> <th></th> </tr>'.$result.'</table>';
+				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.' (UNSUPPORTED OBJECT) </th> <th></th> </tr>'.$result;
 			}
 		}
+	}
+
+	function make_table(){
+		return '<table class="bioschemas_validation">'.$this->message_output.'</table>';
 	}
 
 	function validate_json($json){
