@@ -119,7 +119,7 @@ class toolProcessor extends stdClass{
 		
 		if(!$error){
 			if(!$warning){
-				$output.= '<tr class="table_line"><td class="fa first_col fa-check-circle" aria-hidden="true"> </td><td class="field_name">'.$field_name.'</td></tr>';
+				$output.= '<tr class="table_line"><td class="fa first_col fa-check-circle" aria-hidden="true"> </td><td class="field_name">'.$field_name.'</td> <td class="field_value"></td></tr>';
 			}
 			else{
 				$output.='<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning">'.$field_name.'</td><td class="field_value field_warning">'.$warning.'</td></tr>';
@@ -137,7 +137,7 @@ class toolProcessor extends stdClass{
 		$padding = 20*$level;
 		
 		if (gettype($field_value)!='array'){
-			$output.= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:'.$padding.'px" class="field_name">'.$field_name.'</td> </tr>';
+			$output.= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:'.$padding.'px" class="field_name">'.$field_name.'</td> <td class="field_value"></td> </tr>';
 			$padding = $padding+20;
 			foreach ($field_value as $subfield_name=>$subfield_value){
 				if (gettype($subfield_value)=='string'){
@@ -154,7 +154,7 @@ class toolProcessor extends stdClass{
 					$output .= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:'.$padding.'px" class="field_name">'.$subfield_name.'</td><td class="field_value">'.$subfield_value.' </td> </tr>';
 				}
 				elseif(gettype($subfield_value) != 'string'){
-					$output .= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:'.$padding.'px" class="field_name">'.$subfield_name.'</td> </tr>';
+					$output .= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:'.$padding.'px" class="field_name">'.$subfield_name.'</td> <td class="field_value"></td> </tr>';
 					$output .= $this->recursive_print($field_name, $subfield_value, $level+1);
 				}
 			}
