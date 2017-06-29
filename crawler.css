@@ -1,3 +1,56 @@
+body.page-bioschemas-crawler h1.page-header{
+	display: none;
+}
+
+body.page-bioschemas-crawler header#navbar{
+	width:100%;
+	max-width:100%;
+	margin-top: 0px;
+	position: relative;
+}
+
+body.page-bioschemas-crawler header#navbar a.name{
+	position: relative;
+	top:35px;
+	font-size: 30px;
+}
+
+body.page-bioschemas-crawler aside{
+	width:15%;
+}
+
+body.page-bioschemas-crawler div#navbar-collapse{
+	width: 30%;
+	display: inline-block !important;
+	float: right;
+	height: 100px !important;
+	padding:10px;
+}
+
+body.page-bioschemas-crawler div#navbar-collapse h2{
+	display: none;
+}
+
+form#user-login-form div.form-item{
+	width:50%;
+	display: inline-block;	
+}
+
+form#user-login-form ul{
+	display:none;
+}
+
+form#user-login-form div#edit-actions{
+	display: inline-block;
+	position: relative;
+	top: -8px;
+	left: 1px;
+}
+
+form#user-login-form div.form-item input, form#user-login-form div#edit-actions button{
+	border-radius: 0px;
+}
+
 div.main-container{
 	width:100%;
 }
