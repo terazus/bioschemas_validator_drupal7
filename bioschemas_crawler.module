@@ -12,7 +12,7 @@
 
 require_once 'easyrdf/lib/EasyRdf.php';
 require_once 'easyrdf/vendor/autoload.php';
-require_once 'classes/toolProcessor.php';
+require_once 'classes/BSCProcessor.php';
 
 
 function bioschemas_crawler_menu(){
@@ -180,13 +180,13 @@ function display_result(&$form_state){
 		foreach($myjson as $sub_json){
 			$new_json = prepare_subjson($myjson, $sub_json);
 			if (in_array(strtolower(str_replace('https://schema.org/', '', str_replace('http://schema.org/', '', $new_json->{'@type'}))), $allowed_main_object)){			
-				$tool = new toolProcessor($new_json);
+				$tool = new BSCProcessor($new_json);
 				$insert_message = $tool->make_table();
 				$message .= "<div class='bs_output'>".$insert_message."</div>";
 				$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
 				
 				/*if ($new_json->{'@type'} == 'http://schema.org/SoftwareApplication'){
-					$tool = new toolProcessor($new_json);
+					$tool = new BSCProcessor($new_json);
 					$message .= "<div class='bs_output'>".$tool->message_output."</div>";
 					dpm($new_json);
 					$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
@@ -214,7 +214,7 @@ function display_result(&$form_state){
 			//}
 			if (isset(json_decode($json)->{'@graph'})){
 				foreach (json_decode($json)->{'@graph'} as $newtool){
-					$tool = new toolProcessor($newtool);
+					$tool = new BSCProcessor($newtool);
 					$insert_message = $tool->make_table();
 					$message .= "<div class='bs_output'>".$insert_message."</div>";
 					$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode(json_decode($json)->{'@graph'}, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
@@ -224,7 +224,7 @@ function display_result(&$form_state){
 			
 
 			else{
-				$tool = new toolProcessor(json_decode($json));
+				$tool = new BSCProcessor(json_decode($json));
 				//dpm($tool);
 				$insert_message = $tool->make_table();
 				$message .= "<div class='bs_output'>".$insert_message."</div>";

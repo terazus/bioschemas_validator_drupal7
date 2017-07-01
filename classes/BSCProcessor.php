@@ -10,7 +10,7 @@
 require_once 'objects_templates.php';
 
 
-class toolProcessor extends stdClass{
+class BSCProcessor extends stdClass{
 
 	var $template_fields;
 	var $message_output = '';
