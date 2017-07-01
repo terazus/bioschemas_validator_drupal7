@@ -173,7 +173,7 @@ class toolProcessor extends stdClass{
 	function process_string_field($field_name, $field_value){
 		$output = '';
 		if (!isset($this->template_fields[$field_name])){
-			$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name">'.$field_name.'</td><td class="field_value">'.$field_value.' </td> </tr>';
+			$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning">'.$field_name.'</td><td class="field_value field_warning">'.$field_value.' </td> </tr>';
 		}
 		elseif (typeof($field_value) == $this->template_fields[$field_name]['type']){
 			$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name">'.$field_name.'</td><td class="field_value">'.$field_value.'</td></tr>';
