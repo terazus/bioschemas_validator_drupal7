@@ -25,7 +25,7 @@ class toolProcessor extends stdClass{
 		}
 		else { 
 			$this->values = $json;
-			$this->template_fields = get_template($json->{"@type"});
+			$this->template_fields = get_template(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})));
 			if ($this->template_fields!=null){
 				$result = $this->validate_json($this->values);
 				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th></th> </tr>'.$result;
@@ -175,7 +175,7 @@ class toolProcessor extends stdClass{
 				$output.= '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td>'.typeof($field_value).' is not a valid target for field '.$field_name.'</td></tr>';
 			}
 			else{
-				$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"> </td> <td class="field_name">'.$field_name.'</td><rd class="field_value">'.$field_value.'</td></tr>';
+				$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"> </td> <td class="field_name">'.$field_name.'</td><td class="field_value">'.$field_value.'</td></tr>';
 			}
 		}
 		return $output;

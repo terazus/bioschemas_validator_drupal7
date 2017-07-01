@@ -14,6 +14,7 @@ require_once 'easyrdf/lib/EasyRdf.php';
 require_once 'easyrdf/vendor/autoload.php';
 require_once 'classes/toolProcessor.php';
 
+
 function bioschemas_crawler_menu(){
 	$items['bioschemas_crawler'] = array( 
 			'title' => t('Bioschemas structured data testing tool'), 
@@ -88,8 +89,19 @@ function prepare_json($json_input){
 	// for each item in the json (relinking data together)
 	foreach ($json_input as $item=>$item_fields){
 
-
-		$new_json[$item_fields->{'@id'}] = $item_fields;
+		// Retrieving the key and values to fill in the array
+		if(isset($item_fields->{'@id'})){
+			$new_json[$item_fields->{'@id'}] = $item_fields;
+		}
+		else{
+			if(isset($item_fields->{'https://schema.org/url'})){
+				$new_json[$item_fields->{'https://schema.org/url'}] = $item_fields;
+			}
+			elseif (isset($item_fields->{'http://schema.org/url'})) {
+				$new_json[$item_fields->{'http://schema.org/url'}] = $item_fields;
+			}
+			
+		}
 
 		// for each field of the current item
 		foreach ($item_fields as $field_name=>$field_value){
@@ -154,6 +166,7 @@ function prepare_subjson($myjson, $sub_json){
 
 function display_result(&$form_state){
 
+	$allowed_main_object = array('softwareapplication', 'event');
 	$message = '<div> <HR>';
 
 	if($form_state['input']['target_format']=='rdfa'){
@@ -165,13 +178,21 @@ function display_result(&$form_state){
 		$myjson = prepare_json($myjson->{'@graph'});
 
 		foreach($myjson as $sub_json){
-			$new_json = prepare_subjson($myjson, $sub_json);			
-			if ($new_json->{'@type'} == 'http://schema.org/SoftwareApplication'){
+			$new_json = prepare_subjson($myjson, $sub_json);
+			if (in_array(strtolower(str_replace('https://schema.org/', '', str_replace('http://schema.org/', '', $new_json->{'@type'}))), $allowed_main_object)){			
 				$tool = new toolProcessor($new_json);
-				$message .= "<div class='bs_output'>".$tool->message_output."</div>";
-				dpm($new_json);
+				$insert_message = $tool->make_table();
+				$message .= "<div class='bs_output'>".$insert_message."</div>";
 				$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+				
+				/*if ($new_json->{'@type'} == 'http://schema.org/SoftwareApplication'){
+					$tool = new toolProcessor($new_json);
+					$message .= "<div class='bs_output'>".$tool->message_output."</div>";
+					dpm($new_json);
+					$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+				}*/
 			}
+			
 		}
 	}
 
