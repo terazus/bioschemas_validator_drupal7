@@ -24,7 +24,6 @@ Usage (outside drupal):
     }			
     else{
       $tool = new BSCProcessor(json_decode($json));
-      //dpm($tool);
       $insert_message = $tool->make_table();
       $message .= "<div class='bs_output'>".$insert_message."</div>";
     }
