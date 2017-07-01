@@ -77,6 +77,14 @@ class toolProcessor extends stdClass{
 				}
 			}
 		}
+
+		foreach ($this->template_fields as $field_name=>$field_value){
+			if ($field_value['presence'] == 'required'){
+				if (!isset($json->{$field_name})){
+					$output .= '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"></td><td class="field_name error_field">'.$field_name.'</td><td class="field_value error_field"> A required field is missing </td> </tr>';
+				}
+			}
+		}
 		return $output;
 	}
 
@@ -90,7 +98,7 @@ class toolProcessor extends stdClass{
 			if ($subfield_name == '@type'){
 				if (!isset($this->template_fields[$field_name])){
 					$suboutput.= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:20px" class="field_name"> @type </td> <td class="field_value">'.$field_value->{'@type'}.'</td></tr>';
-					$warning = $field_value->{'@type'}.' is not supported by Bioschemas specifications';
+					$warning = $field_name.' is not supported by Bioschemas specifications';
 				}
 				elseif (in_array($field_value->{'@type'}, $this->template_fields[$field_name]['values'])){
 					$suboutput.= '<tr class="table_line"><td class="first_col"></td><td style="padding-left:20px" class="field_name"> @type</td><td class="field_value">'.$field_value->{'@type'}.'</td></tr>';
