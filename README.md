@@ -2,6 +2,7 @@
 
 Usage (outside drupal):
   
+  ```php
   $context = stream_context_create(array('http' => array('ignore_errors' => true)));
   $html = file_get_contents('https://www.france-bioinformatique.fr/fr/bioschemas_crawler_test');
   $dom = new DOMDocument();
@@ -30,3 +31,4 @@ Usage (outside drupal):
   }
   
   echo $message;
+  ```
