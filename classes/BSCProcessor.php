@@ -180,7 +180,7 @@ class BSCProcessor extends stdClass{
 		}
 		else{
 			if ($field_name!='@type'){
-				$output.= '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td>'.typeof($field_value).' is not a valid target for field '.$field_name.'</td></tr>';
+				$output.= '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td class="field_name error_field">'.$field_name.'</td><td class="field_value error_field">'.typeof($field_value).' is not a valid target for field '.$field_name.'</td></tr>';
 			}
 			else{
 				$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"> </td> <td class="field_name">'.$field_name.'</td><td class="field_value">'.$field_value.'</td></tr>';

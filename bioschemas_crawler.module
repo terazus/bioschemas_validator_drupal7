@@ -70,7 +70,11 @@ function bioschemas_crawler_form($form, &$form_state){
 			'#suffix' =>  '</div>',
 	);
 
-
+	$form['custom_input'] = array(
+			'#title' => t("Enter your json code here"),
+			'#type' => 'textarea',
+			'#required' => FALSE,
+	);
 
 
 	if ($form_state['submitted']==TRUE){
@@ -169,69 +173,78 @@ function display_result(&$form_state){
 	$allowed_main_object = array('softwareapplication', 'event');
 	$message = '<div> <HR>';
 
-	if($form_state['input']['target_format']=='rdfa'){
-		$json_input = new EasyRdf_Graph($form_state['input']['target_url']);
-		$json_input->load();
-		$options = array('compact'=>true);
-		$serialiser = new EasyRdf_Serialiser_JsonLd();
-		$myjson = json_decode($serialiser->serialise($json_input, 'jsonld', $options));
-		$myjson = prepare_json($myjson->{'@graph'});
+	
+	if($form_state['input']['custom_input']== NULL){
+		if($form_state['input']['target_format']=='rdfa'){
+			$json_input = new EasyRdf_Graph($form_state['input']['target_url']);
+			$json_input->load();
+			$options = array('compact'=>true);
+			$serialiser = new EasyRdf_Serialiser_JsonLd();
+			$myjson = json_decode($serialiser->serialise($json_input, 'jsonld', $options));
+			$myjson = prepare_json($myjson->{'@graph'});
 
-		foreach($myjson as $sub_json){
-			$new_json = prepare_subjson($myjson, $sub_json);
-			if (in_array(strtolower(str_replace('https://schema.org/', '', str_replace('http://schema.org/', '', $new_json->{'@type'}))), $allowed_main_object)){			
-				$tool = new BSCProcessor($new_json);
-				$insert_message = $tool->make_table();
-				$message .= "<div class='bs_output'>".$insert_message."</div>";
-				$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
-				
-				/*if ($new_json->{'@type'} == 'http://schema.org/SoftwareApplication'){
+			foreach($myjson as $sub_json){
+				$new_json = prepare_subjson($myjson, $sub_json);
+				if (in_array(strtolower(str_replace('https://schema.org/', '', str_replace('http://schema.org/', '', $new_json->{'@type'}))), $allowed_main_object)){			
 					$tool = new BSCProcessor($new_json);
-					$message .= "<div class='bs_output'>".$tool->message_output."</div>";
-					dpm($new_json);
+					$insert_message = $tool->make_table();
+					$message .= "<div class='bs_output'>".$insert_message."</div>";
 					$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
-				}*/
+					
+				}
+				
 			}
-			
+		}
+
+		else{
+			$context = stream_context_create(array('http' => array('ignore_errors' => true)));
+			$html = file_get_contents($form_state['input']['target_url'], false, $context);
+			$dom = new DOMDocument();
+			libxml_use_internal_errors( 1 );
+			$dom->loadHTML( $html );
+			$xpath = new DOMXpath( $dom );
+
+			$script = $dom->getElementsByTagName( 'script' );
+			$script = $xpath->query( '//script[@type="application/ld+json"]' );
+			foreach ($script as $item) {		
+				$json = $item->nodeValue;
+				//foreach (json_decode($json) as $item){
+					//dpm($item);
+					// Use to loop to get all the items in the json before testing the presence or absence of the @graph attribute.
+				//}
+				if (isset(json_decode($json)->{'@graph'})){
+					foreach (json_decode($json)->{'@graph'} as $newtool){
+						$tool = new BSCProcessor($newtool);
+						$insert_message = $tool->make_table();
+						$message .= "<div class='bs_output'>".$insert_message."</div>";
+						$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode(json_decode($json)->{'@graph'}, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+					}
+
+				}
+				
+
+				else{
+					$tool = new BSCProcessor(json_decode($json));
+					//dpm($tool);
+					$insert_message = $tool->make_table();
+					$message .= "<div class='bs_output'>".$insert_message."</div>";
+					$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.$json.'</pre></div>';
+				}
+			}
 		}
 	}
 
 	else{
-		$context = stream_context_create(array('http' => array('ignore_errors' => true)));
-		$html = file_get_contents($form_state['input']['target_url'], false, $context);
-		$dom = new DOMDocument();
-		libxml_use_internal_errors( 1 );
-		$dom->loadHTML( $html );
-		$xpath = new DOMXpath( $dom );
-
-		$script = $dom->getElementsByTagName( 'script' );
-		$script = $xpath->query( '//script[@type="application/ld+json"]' );
-		foreach ($script as $item) {		
-			$json = $item->nodeValue;
-			//foreach (json_decode($json) as $item){
-				//dpm($item);
-				// Use to loop to get all the items in the json before testing the presence or absence of the @graph attribute.
-			//}
-			if (isset(json_decode($json)->{'@graph'})){
-				foreach (json_decode($json)->{'@graph'} as $newtool){
-					$tool = new BSCProcessor($newtool);
-					$insert_message = $tool->make_table();
-					$message .= "<div class='bs_output'>".$insert_message."</div>";
-					$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode(json_decode($json)->{'@graph'}, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
-				}
-
-			}
-			
-
-			else{
-				$tool = new BSCProcessor(json_decode($json));
-				//dpm($tool);
-				$insert_message = $tool->make_table();
-				$message .= "<div class='bs_output'>".$insert_message."</div>";
-				$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.$json.'</pre></div>';
-			}
+		$json_input = json_decode($form_state['input']['custom_input']);
+		if ($json_input == false){
+			$message.= '<div>There is a probleme with your json</div>';
 		}
-
+		else{
+			$BSCobject = new BSCProcessor($json_input);
+			$insert_message = $BSCobject->make_table();
+			$message .= "<div class='bs_output'>".$insert_message."</div>";
+			$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode($BSCobject->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+		}
 	}
 
 	return $message."</div>";

@@ -47,7 +47,7 @@ form#user-login-form div#edit-actions{
 	left: 1px;
 }
 
-form#user-login-form div.form-item input, form#user-login-form div#edit-actions button{
+form#user-login-form div.form-item input, form#user-login-form div#edit-actions button, form#bioschemas-crawler-form  textarea{
 	border-radius: 0px;
 }
 
