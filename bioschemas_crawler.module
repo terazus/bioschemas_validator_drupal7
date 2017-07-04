@@ -13,6 +13,7 @@
 require_once 'easyrdf/lib/EasyRdf.php';
 require_once 'easyrdf/vendor/autoload.php';
 require_once 'classes/BSCProcessor.php';
+require_once 'classes/IDEInterpreter.php';
 
 
 function bioschemas_crawler_menu(){
@@ -189,14 +190,14 @@ function display_result(&$form_state){
 					$tool = new BSCProcessor($new_json);
 					$insert_message = $tool->make_table();
 					$message .= "<div class='bs_output'>".$insert_message."</div>";
-					$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+					$message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
 					
 				}
 				
 			}
 		}
 
-		else{
+		elseif ($form_state['input']['target_format']=='jsonld'){
 			$context = stream_context_create(array('http' => array('ignore_errors' => true)));
 			$html = file_get_contents($form_state['input']['target_url'], false, $context);
 			$dom = new DOMDocument();
@@ -217,7 +218,7 @@ function display_result(&$form_state){
 						$tool = new BSCProcessor($newtool);
 						$insert_message = $tool->make_table();
 						$message .= "<div class='bs_output'>".$insert_message."</div>";
-						$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode(json_decode($json)->{'@graph'}, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+						$message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode(json_decode($json)->{'@graph'}, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
 					}
 
 				}				
@@ -227,7 +228,7 @@ function display_result(&$form_state){
 					$tool = new BSCProcessor(json_decode($json));
 					$insert_message = $tool->make_table();
 					$message .= "<div class='bs_output'>".$insert_message."</div>";
-					$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.$json.'</pre></div>';
+					$message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode(json_decode($json), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
 				}
 			}
 		}
@@ -241,6 +242,8 @@ function display_result(&$form_state){
 			$message.= '<div>There is a probleme with your json</div>';
 		}
 		else{
+			$new_ide = new IDEInterpreter($json_input);
+			$message .= $new_ide->message;
 			$BSCobject = new BSCProcessor($json_input);
 			$insert_message = $BSCobject->make_table();
 			$message .= "<div class='bs_output'>".$insert_message."</div>";
