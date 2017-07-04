@@ -28,7 +28,8 @@ class BSCProcessor extends stdClass{
 			$this->template_fields = get_template(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})));
 			if ($this->template_fields!=null){
 				$result = $this->validate_json($this->values);
-				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th></th> </tr>'.$result;
+				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th class="object_errors">'.count($this->error).' error(s) & '.
+				count($this->warning).' warning(s) </th> </tr>'.$result;
 			}
 			else{
 				$result = $this->validate_json($this->values);
@@ -68,7 +69,13 @@ class BSCProcessor extends stdClass{
 						}
 					}
 					else{
+
+						// MULTIPLE VALUES ERROR
+						$local_error = array(
+							"field"=>$field_name,
+							"error"=>"Multiple values not allowed");
 						$output.='<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td>'.$field_name.' Multiple values are not allowed for that field </td></tr>';
+						array_push($this->error, $local_error);
 					}
 				}
 
@@ -81,7 +88,13 @@ class BSCProcessor extends stdClass{
 		foreach ($this->template_fields as $field_name=>$field_value){
 			if ($field_value['presence'] == 'required'){
 				if (!isset($json->{$field_name})){
+
+					// REQUIRED FIELD MISSING ERROR
+					$local_error = array(
+							"field"=>$field_name,
+							"error"=>"Required field missing");
 					$output .= '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"></td><td class="field_name error_field">'.$field_name.'</td><td class="field_value error_field"> A required field is missing </td> </tr>';
+					array_push($this->error, $local_error);
 				}
 			}
 		}
@@ -97,6 +110,8 @@ class BSCProcessor extends stdClass{
 
 			if ($subfield_name == '@type'){
 				if (!isset($this->template_fields[$field_name])){
+
+					// UNSUPPORTED OBJCET FIELD WARNING
 					$suboutput.= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:20px" class="field_name"> @type </td> <td class="field_value">'.$field_value->{'@type'}.'</td></tr>';
 					$warning = $field_name.' is not supported by Bioschemas specifications';
 				}
@@ -129,12 +144,17 @@ class BSCProcessor extends stdClass{
 			if(!$warning){
 				$output.= '<tr class="table_line"><td class="fa first_col fa-check-circle" aria-hidden="true"> </td><td class="field_name">'.$field_name.'</td> <td class="field_value"></td></tr>';
 			}
+			// OBJECT FIELD WARNING
 			else{
 				$output.='<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning">'.$field_name.'</td><td class="field_value field_warning">'.$warning.'</td></tr>';
+				$local_warning = array('field'=>$field_name, 'error'=>'Unsupported field');
+				array_push($this->warning, $local_warning);
 			}
 		}
 		else{
 			$output.='<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"></td><td class="field_name error_field">'.$field_name.'</td><td class="field_value error_field">'.$error.'</td></tr>';
+			$local_error = array('field'=>$field_name, 'error'=>'Unexpected target type');
+			array_push($this->error, $local_error);
 		}
 		$output.=$suboutput;
 		return $output;
@@ -172,15 +192,27 @@ class BSCProcessor extends stdClass{
 
 	function process_string_field($field_name, $field_value){
 		$output = '';
+
+		// UNSUPPORTED STRING FIELD WARNING
 		if (!isset($this->template_fields[$field_name])){
 			$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning">'.$field_name.'</td><td class="field_value field_warning">'.$field_value.' </td> </tr>';
+			$local_warning = array(
+						'field'=>$field_name,
+						'error'=>'Field not supported');
+			array_push($this->warning, $local_warning);
 		}
+
+
 		elseif (typeof($field_value) == $this->template_fields[$field_name]['type']){
 			$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name">'.$field_name.'</td><td class="field_value">'.$field_value.'</td></tr>';
 		}
 		else{
+
+			// UNEXPECTED TARGET TYPE ERROR
 			if ($field_name!='@type'){
 				$output.= '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td class="field_name error_field">'.$field_name.'</td><td class="field_value error_field">'.typeof($field_value).' is not a valid target for field '.$field_name.'</td></tr>';
+				$local_error = array('field'=>$field_name, 'error'=>"unexpected type as target");
+				array_push($this->error, $local_error);
 			}
 			else{
 				$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"> </td> <td class="field_name">'.$field_name.'</td><td class="field_value">'.$field_value.'</td></tr>';

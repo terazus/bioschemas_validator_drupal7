@@ -168,6 +168,12 @@ div.bs_output tr.first_line{
 	height:40px;
 }
 
+div.bs_output th.object_errors{
+	text-align:right;
+	padding-right: 10px;
+}
+
+
 div.bs_output tr.table_line td.first_col{
 	width:20px;
 	padding-left: 5px;
