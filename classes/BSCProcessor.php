@@ -97,6 +97,17 @@ class BSCProcessor extends stdClass{
 					array_push($this->error, $local_error);
 				}
 			}
+			elseif ($field_value['presence'] == 'recommended'){
+				if (!isset($json->{$field_name})){
+
+					// REQUIRED FIELD MISSING ERROR
+					$local_warning = array(
+							"field"=>$field_name,
+							"warning"=>"Required field missing");
+					$output .= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning">'.$field_name.'</td><td class="field_value field_warning"> A recommended field is missing </td> </tr>';
+					array_push($this->warning, $local_warning);
+				}
+			}
 		}
 		return $output;
 	}
