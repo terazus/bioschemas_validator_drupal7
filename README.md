@@ -13,6 +13,5 @@ PHP library usage example:
   $message = '';
   $tool = new BSCProcessor(json_decode($json));
   $message .= "<div class='bs_output'>".$tool->make_table()."</div>";
-    }
   echo $message;
   ```
