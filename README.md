@@ -1,21 +1,17 @@
 # bioschemas_validator_drupal7
 
-Usage (outside drupal):
+Deploy the app localy:
+Install Apache and PHP (WAMP/MAMP recommanded for non linux).
+  In the diretory where Apache reads (by default, /var/www/ on Ubuntu and /Applications/MAMP/htdocs on MacOS), create your app directory and clone this code repo.
+  Install font-awesome at the root of your site.
+  Go to localhost:port/mysite and you are ready to go.  
   
-  ```php
-  $context = stream_context_create(array('http' => array('ignore_errors' => true)));
-  $html = file_get_contents('https://www.france-bioinformatique.fr/fr/bioschemas_crawler_test');
-  $dom = new DOMDocument();
-  libxml_use_internal_errors( 1 );
-  $dom->loadHTML( $html );
-  $xpath = new DOMXpath( $dom );
 
-  $script = $dom->getElementsByTagName( 'script' );
-  $script = $xpath->query( '//script[@type="application/ld+json"]' );
+PHP library usage example:  
+  ```php
+  $json = {'@type':'SoftwareApplication', 'name'='test'};
   $message = '';
-  foreach ($script as $item) {		
-    $json = $item->nodeValue;
-    if (isset(json_decode($json)->{'@graph'})){
+  if (isset(json_decode($json)->{'@graph'})){
       foreach (json_decode($json)->{'@graph'} as $newtool){
         $tool = new BSCProcessor($newtool);
         $insert_message = $tool->make_table();
@@ -27,7 +23,5 @@ Usage (outside drupal):
       $insert_message = $tool->make_table();
       $message .= "<div class='bs_output'>".$insert_message."</div>";
     }
-  }
-  
   echo $message;
   ```
