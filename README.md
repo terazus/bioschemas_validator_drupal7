@@ -11,17 +11,8 @@ PHP library usage example:
   ```php
   $json = {'@type':'SoftwareApplication', 'name'='test'};
   $message = '';
-  if (isset(json_decode($json)->{'@graph'})){
-      foreach (json_decode($json)->{'@graph'} as $newtool){
-        $tool = new BSCProcessor($newtool);
-        $insert_message = $tool->make_table();
-        $message .= "<div class='bs_output'>".$insert_message."</div>";
-      }
-    }			
-    else{
-      $tool = new BSCProcessor(json_decode($json));
-      $insert_message = $tool->make_table();
-      $message .= "<div class='bs_output'>".$insert_message."</div>";
+  $tool = new BSCProcessor(json_decode($json));
+  $message .= "<div class='bs_output'>".$tool->make_table()."</div>";
     }
   echo $message;
   ```
