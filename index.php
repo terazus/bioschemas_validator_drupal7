@@ -19,7 +19,7 @@
     <header class="jumbotron">
       <div class="container">
         <div class="navbar-header">
-          <a class="logo" href="/BSC/" title="Home"> <img src="http://localhost:8080/Bioschemas_crawler/sites/default/files/ifb-logo_1.png" alt="Home"> </a>
+          <a class="logo" href="/BSC/" title="Home"> <img src="http://www.france-bioinformatique.fr/sites/default/files/ifb-logo_1.png" alt="Home"> </a>
           <a class="name" href="/BSC/" title="Home">Bioschemas Validation Tool</a> 
         </div>
       </div>
