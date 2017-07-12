@@ -91,6 +91,88 @@
 					)
 			),
 
+			"person"=>array(
+				'@type'=>array(
+					'presence'=>'required',
+					'type'=>'string',
+					'cardinality'=>False
+					),
+				'name'=>array(
+					'presence'=>'required',
+					'type'=>'string',
+					'cardinality'=>False
+					),
+				'email'=>array(
+					'presence'=>'recommended',
+					'type'=>'string',
+					'cardinality'=>False
+					),
+				'description'=>array(
+					'presence'=>'recommended',
+					'type'=>'string',
+					'cardinality'=>False
+					),
+			),
+
+			"organization"=>array(
+				'@type'=>array(
+					'presence'=>'required',
+					'type'=>'string',
+					'cardinality'=>False
+					)
+			),
+
+			"creativework"=>array(
+				'@type'=>array(
+					'presence'=>'required',
+					'type'=>'string',
+					'cardinality'=>False
+					),
+				'name'=>array(
+					'presence'=>'required',
+					'type'=>'string',
+					'cardinality'=>False
+					),
+				'url'=>array(
+					'presence'=>'required',
+					'type'=>'uri',
+					'cardinality'=>False
+					),
+			),
+
+			"controlaction"=>array(
+				'@type'=>array(
+					'presence'=>'required',
+					'type'=>'string',
+					'cardinality'=>False
+					),
+				'object'=>array(
+					'presence'=>'recommended',
+					'type'=>'object',
+					'values'=>['Dataset'],
+					'cardinality'=>True
+					),
+				'result'=>array(
+					'presence'=>'recommended',
+					'type'=>'object',
+					'values'=>['Dataset'],
+					'cardinality'=>True
+					),
+			),
+
+			"dataset"=>array(
+				'@type'=>array(
+					'presence'=>'required',
+					'type'=>'string',
+					'cardinality'=>False
+					),
+				'additionalType'=>array(
+					'presence'=>'required',
+					'type'=>'uri',
+					'cardinality'=>False
+					)
+			),
+
 			// Event spec
 			"event"=>array(
 				'@type'=>array(

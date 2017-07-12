@@ -8,6 +8,7 @@
 
 
 require_once 'objects_templates.php';
+require_once 'BSCsubProcessor.php';
 
 
 class BSCProcessor extends stdClass{
@@ -17,6 +18,7 @@ class BSCProcessor extends stdClass{
 	var $values;
 	var $error = array();
 	var $warning = array();
+	var $sublevel = 1;
 
 
 	function __construct($json) {
@@ -44,6 +46,9 @@ class BSCProcessor extends stdClass{
 
 	function validate_json($json){
 
+		$padding = $this->sublevel*20;
+		$padding = $padding.'px';
+		$output = '';
 		$output = '' ;
 
 		foreach ($json as $field_name=>$field_value){
@@ -54,7 +59,7 @@ class BSCProcessor extends stdClass{
 				}
 
 				if(gettype($field_value) == 'object'){
-					$output .= $this->process_object_field($field_name, $field_value, 0);
+					$output .= $this->process_object_field($field_value, $field_name, $this->sublevel+1);
 				}
 
 				if(gettype($field_value) == 'array'){
@@ -64,7 +69,7 @@ class BSCProcessor extends stdClass{
 								$output .= $this->process_string_field($field_name, $subfield_value);
 							}
 							elseif(gettype($subfield_value) == 'object'){
-								$output .= $this->process_object_field($field_name, $subfield_value, 0);
+								$output .= $this->process_object_field($subfield_value, $field_name, $this->sublevel+1);
 							}
 						}
 					}
@@ -85,6 +90,7 @@ class BSCProcessor extends stdClass{
 			}
 		}
 
+		// ERRORS AND WARNINGS FOR MISSING FIELDS
 		foreach ($this->template_fields as $field_name=>$field_value){
 			if ($field_value['presence'] == 'required'){
 				if (!isset($json->{$field_name})){
@@ -93,7 +99,7 @@ class BSCProcessor extends stdClass{
 					$local_error = array(
 							"field"=>$field_name,
 							"error"=>"Required field missing");
-					$output .= '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"></td><td class="field_name error_field">'.$field_name.'</td><td class="field_value error_field"> A required field is missing </td> </tr>';
+					$output .= '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"></td><td class="field_name error_field" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value error_field"> A required field is missing </td> </tr>';
 					array_push($this->error, $local_error);
 				}
 			}
@@ -104,7 +110,7 @@ class BSCProcessor extends stdClass{
 					$local_warning = array(
 							"field"=>$field_name,
 							"warning"=>"Required field missing");
-					$output .= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning">'.$field_name.'</td><td class="field_value field_warning"> A recommended field is missing </td> </tr>';
+					$output .= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning"> A recommended field is missing </td> </tr>';
 					array_push($this->warning, $local_warning);
 				}
 			}
@@ -112,102 +118,32 @@ class BSCProcessor extends stdClass{
 		return $output;
 	}
 
-	function process_object_field($field_name, $field_value, $level){
-		$suboutput = '';
-		$error = false;
-		$warning = false;
-		
-		foreach ($field_value as $subfield_name=>$subfield_value){
-
-			if ($subfield_name == '@type'){
-				if (!isset($this->template_fields[$field_name])){
-
-					// UNSUPPORTED OBJCET FIELD WARNING
-					$suboutput.= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:20px" class="field_name"> @type </td> <td class="field_value">'.$field_value->{'@type'}.'</td></tr>';
-					$warning = $field_name.' is not supported by Bioschemas specifications';
-				}
-				elseif (in_array($field_value->{'@type'}, $this->template_fields[$field_name]['values'])){
-					$suboutput.= '<tr class="table_line"><td class="first_col"></td><td style="padding-left:20px" class="field_name"> @type</td><td class="field_value">'.$field_value->{'@type'}.'</td></tr>';
-				}
-				else{
-					$suboutput.= '<tr class="table_line"><td class="first_col"></td><td style="padding-left:20px" class="field_name"> @type</td><td class="field_value">'.$field_value->{'@type'}.'</td></tr>';
-					$error = $field_value->{'@type'}.' is not a valid target for field '.$field_name;
-				}
-			}
-			else{
-				if (gettype($subfield_value)== 'string'){
-					$suboutput.= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:40px" class="field_name">'.$subfield_name.'</td><td class="field_value">'.$subfield_value.'</td></tr>';
-				}
-				elseif  (gettype($subfield_value)== 'object'){
-					// I think this is where I should declare the new subojects (Person, Organization ...) in order to validate them aswell. Validate the sub-oject before validating the parent.
-					// Can't validate sub-object yet
-					$suboutput.=$this->recursive_print($subfield_name, $subfield_value, 1);
-				}
-				elseif  (gettype($subfield_value)== 'array'){
-					foreach($subfield_value as $key=>$val){
-						$suboutput.=$this->recursive_print($subfield_name, $val, 1);
-					}
-				}
-			}
+	function process_object_field($field_value, $field_name, $level){
+		$subobject = new BSCsubProcessor($field_value, $field_name, $level);
+		if (count($subobject->error)>0){
+			$error = array('field'=>$field_name,
+							'error'=>'error with subfield '.$subobject->error[0]['field']);
+			array_push($this->error, $error);
 		}
-		
-		$output = '';
-		if(!$error){
-			if(!$warning){
-				$output.= '<tr class="table_line"><td class="fa first_col fa-check-circle" aria-hidden="true"> </td><td class="field_name">'.$field_name.'</td> <td class="field_value"></td></tr>';
-			}
-			// OBJECT FIELD WARNING
-			else{
-				$output.='<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning">'.$field_name.'</td><td class="field_value field_warning">'.$warning.'</td></tr>';
-				$local_warning = array('field'=>$field_name, 'error'=>'Unsupported field');
-				array_push($this->warning, $local_warning);
-			}
+		elseif (count($subobject->warning)>0){
+			$warning = array('field'=>$field_name,
+							'warning'=>'error with subfield '.$subobject->warning[0]['field']);
+			array_push($this->warning, $warning);
 		}
-		else{
-			$output.='<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"></td><td class="field_name error_field">'.$field_name.'</td><td class="field_value error_field">'.$error.'</td></tr>';
-			$local_error = array('field'=>$field_name, 'error'=>'Unexpected target type');
-			array_push($this->error, $local_error);
-		}
-		$output.=$suboutput;
-		return $output;
-	}
-
-	function recursive_print($field_name, $field_value, $level){
-		$output = '';
-		$padding = 20*$level;
-		
-		if (gettype($field_value)!='array'){
-			$output.= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:'.$padding.'px" class="field_name">'.$field_name.'</td> <td class="field_value"></td> </tr>';
-			$padding = $padding+20;
-			foreach ($field_value as $subfield_name=>$subfield_value){
-				if (gettype($subfield_value)=='string'){
-					$output.= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:'.$padding.'px" class="field_name">'.$subfield_name.'</td><td class="field_value">'.$subfield_value.' </td> </tr>';
-				}
-				elseif (gettype($subfield_value)=='object'){
-					$output.=$this->recursive_print($subfield_name, $subfield_value, $level+1);
-				}
-			}
-		}
-		else{
-			foreach ($field_value as $subfield_name=>$subfield_value){
-				if (gettype($subfield_value) == 'string'){
-					$output .= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:'.$padding.'px" class="field_name">'.$subfield_name.'</td><td class="field_value">'.$subfield_value.' </td> </tr>';
-				}
-				elseif(gettype($subfield_value) != 'string'){
-					$output .= '<tr class="table_line"> <td class="first_col"></td> <td style="padding-left:'.$padding.'px" class="field_name">'.$subfield_name.'</td> <td class="field_value"></td> </tr>';
-					$output .= $this->recursive_print($field_name, $subfield_value, $level+1);
-				}
-			}
-		}
-		return $output;
+		$message = $subobject->message_output;
+		return $message; 
 	}
 
 	function process_string_field($field_name, $field_value){
 		$output = '';
 
+		$padding = $this->sublevel*20;
+		$padding = $padding.'px';
+		$output = '';
+
 		// UNSUPPORTED STRING FIELD WARNING
 		if (!isset($this->template_fields[$field_name])){
-			$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning">'.$field_name.'</td><td class="field_value field_warning">'.$field_value.' </td> </tr>';
+			$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning">'.$field_value.' </td> </tr>';
 			$local_warning = array(
 						'field'=>$field_name,
 						'error'=>'Field not supported');
@@ -216,18 +152,19 @@ class BSCProcessor extends stdClass{
 
 
 		elseif (typeof($field_value) == $this->template_fields[$field_name]['type']){
-			$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name">'.$field_name.'</td><td class="field_value">'.$field_value.'</td></tr>';
+			$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$field_value.'</td></tr>';
 		}
-		else{
 
+		else{
+			// NEED SOME TWEEKING AROUND HERE TO IMPLEMENT CORRECT ERRORS/WARNINGS
 			// UNEXPECTED TARGET TYPE ERROR
 			if ($field_name!='@type'){
-				$output.= '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td class="field_name error_field">'.$field_name.'</td><td class="field_value error_field">'.typeof($field_value).' is not a valid target for field '.$field_name.'</td></tr>';
+				$output.= '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td class="field_name error_field" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value error_field">'.typeof($field_value).' is not a valid target for field '.$field_name.'</td></tr>';
 				$local_error = array('field'=>$field_name, 'error'=>"unexpected type as target");
 				array_push($this->error, $local_error);
 			}
 			else{
-				$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"> </td> <td class="field_name">'.$field_name.'</td><td class="field_value">'.$field_value.'</td></tr>';
+				$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"> </td> <td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$field_value.'</td></tr>';
 			}
 		}
 		return $output;

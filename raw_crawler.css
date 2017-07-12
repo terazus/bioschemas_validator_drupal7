@@ -138,7 +138,6 @@ div.json_display{
 }
 
 div.bs_output td{
-	padding: 4px 10px;
 	text-align: justify;
 }
 
@@ -177,10 +176,12 @@ div.bs_output th.object_errors{
 div.bs_output tr.table_line td.first_col{
 	width:20px;
 	padding-left: 5px;
+	top:3px;
+	position: relative;
 }
 
 div.bs_output tr.table_line td.field_name{
-	width:300px;
+	width:380px;
 	font-weight: bold;
 	vertical-align: top;
 }
