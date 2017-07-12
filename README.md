@@ -10,8 +10,6 @@ Deploy the app locally: <br />
 PHP library usage example:  
   ```php
   $json = {'@type':'SoftwareApplication', 'name':'test'};
-  $message = '';
   $tool = new BSCProcessor(json_decode($json));
-  $message .= "<div class='bs_output'>".$tool->make_table()."</div>";
-  echo $message;
+  echo "<div class='bs_output'>".$tool->make_table()."</div>";
   ```
