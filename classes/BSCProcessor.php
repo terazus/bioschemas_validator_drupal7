@@ -140,6 +140,7 @@ class BSCProcessor extends stdClass{
 			}
 		}
 		
+		$output = '';
 		if(!$error){
 			if(!$warning){
 				$output.= '<tr class="table_line"><td class="fa first_col fa-check-circle" aria-hidden="true"> </td><td class="field_name">'.$field_name.'</td> <td class="field_value"></td></tr>';

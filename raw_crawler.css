@@ -1,0 +1,174 @@
+/* GENERAL */
+body.page-bioschemas-crawler{
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	padding:5px;
+}
+
+
+/* HEADER */
+body.page-bioschemas-crawler header.jumbotron{
+	padding:0px;
+	margin:0px;
+	border:1px solid #e7e7e7;
+}
+
+@media (min-width:1890px) {
+	.container{
+		width: 1880px !important;
+	}
+}
+
+body.page-bioschemas-crawler a.name{
+	font-size:30px; 
+	text-align: center;
+}
+
+
+/* FORM */
+body.page-bioschemas-crawler form{
+	margin-top: 15px;
+}
+
+body.page-bioschemas-crawler form input#url,
+body.page-bioschemas-crawler form select#format{
+	color:#555;
+}
+
+body.page-bioschemas-crawler form input#url,
+body.page-bioschemas-crawler form select#format,
+body.page-bioschemas-crawler form button{
+	height: 60px;
+    border-radius: 0px;
+    font-size: 22px;
+    padding:6px 12px;
+    border-radius: 0px;
+    vertical-align: top;
+}
+
+@media(min-width:768px) {
+	body.page-bioschemas-crawler form input#url{
+		width:55%; 
+	}
+	body.page-bioschemas-crawler form select#format {
+		width:21%;
+	}
+	body.page-bioschemas-crawler form button{
+		width:20%;
+	}	
+}
+
+@media(min-width:1200px) {
+	body.page-bioschemas-crawler form input#url{
+		width:65%; 
+	}
+	body.page-bioschemas-crawler form select#format {
+		width:14%;
+	}
+	body.page-bioschemas-crawler form button{
+		width:20.5%;
+	}	
+}
+
+
+
+/**********************************************************************/
+
+
+/* OUTPUT */
+div.bs_output{
+	margin-top: 20px;
+	width:40%;
+	display: inline-block;
+	vertical-align: top;
+	font-size:16px;
+}
+
+div.json_display pre{
+	overflow: auto;
+ 	word-wrap: normal;
+  	white-space: pre;
+}
+
+div.json_display{
+	width:59%;
+	display: inline-block;
+	vertical-align: top;
+	border:1px solid #ccc;
+	margin-left:1%;
+	padding:20px;
+	margin-top:20px;
+}
+
+
+/*      */
+
+table.bioschemas_validation{
+	width:100%;
+	border-collapse: collapse;
+}
+
+div.bs_output tr.table_line{
+	border:1px solid #ccc;
+	border-top:0px;
+	width:98%;
+	padding-left:10px;
+	padding-right:10px;
+}
+
+div.bs_output tr.table_line:hover{
+	background-color: #ccc;
+}
+
+div.bs_output tr.first_line{
+	border:1px solid #ccc;
+	padding:5px 15px 5px 15px;
+	height:40px;
+}
+
+div.bs_output th.object_errors{
+	text-align:right;
+	padding-right: 10px;
+}
+
+
+div.bs_output tr.table_line td.first_col{
+	width:20px;
+	padding-left: 5px;
+}
+
+div.bs_output tr.table_line td.field_name{
+	width:300px;
+	font-weight: bold;
+	vertical-align: top;
+}
+
+div.bs_output tr.table_line td.field_value{
+	width:500px;
+	vertical-align: top;
+}
+
+div.bs_output td.fa-check-circle{
+	color:green;
+	background-color: transparent;
+	margin-right: 5px;
+}
+
+div.bs_output td.fa-exclamation-triangle{
+	color:orange;
+	background-color: transparent;
+	margin-right: 5px;
+}
+
+div.bs_output td.fa-times-circle{
+	color:red;
+	background-color: transparent;
+	margin-right: 5px;
+}
+
+div.bs_output td.error_field{
+	color:red;
+}
+
+div.bs_output td.field_warning{
+	color:orange;
+}

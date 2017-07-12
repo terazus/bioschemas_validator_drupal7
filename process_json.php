@@ -1,3 +1,10 @@
+<?php
+require 'classes/BSCProcessor.php';
+$input_url = $_GET['url'];
+$input_format = $_GET['format'];
+
+?>
+
 <HTML> 
 
   <head>
@@ -27,7 +34,7 @@
 
     <div class="container">
       <form action="process_json.php" method="get">
-        <input type="text" id="url" name="url"/>
+        <input type="text" id="url" name="url" value="<?php echo $input_url; ?>"/>
         <select id="format" name="format">
           <option value="jsonld">JSON-LD</option>
           <!--<option value="rdfa">RDFa</option>-->
@@ -36,5 +43,63 @@
       </form>
     </div>
 
-  </body>
-</HTML>
+
+
+<?php
+  
+  if (is_url($input_url)){
+    echo process_json($input_url);
+  }
+
+  else {
+    echo '
+    <div class="container">
+      <div class="alert alert-danger">
+        <strong>Error: </strong> Please provide a valid URL string
+      </div>
+    </div>';
+  }
+
+  function is_url($val){
+    if(filter_var($val, FILTER_VALIDATE_URL)){
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  function process_json($url){
+    $message = '';
+    $context = stream_context_create(array('http' => array('ignore_errors' => true)));
+    $html = file_get_contents($url);
+    //$html = file_get_contents('http://localhost/rsat/supported-organisms.cgi');
+    $dom = new DOMDocument();
+    libxml_use_internal_errors( 1 );
+    $dom->loadHTML( $html );
+    $xpath = new DOMXpath( $dom );
+
+    $script = $dom->getElementsByTagName( 'script' );
+    $script = $xpath->query( '//script[@type="application/ld+json"]' );
+
+    foreach ($script as $item) {    
+      $json = $item->nodeValue;
+      if (isset(json_decode($json)->{'@graph'})){
+        foreach (json_decode($json)->{'@graph'} as $newtool){
+          $tool = new BSCProcessor($newtool);
+          $insert_message = $tool->make_table();
+          $message .= "<div class='bs_output'>".$insert_message."</div>";
+        }
+      }     
+      else {
+        $tool = new BSCProcessor(json_decode($json));
+        $insert_message = $tool->make_table();
+        $message .= "<div class='bs_output'>".$insert_message."</div>";
+      }
+    }
+    return '<div class="container">'.$message.'</div>';
+  }
+?>
+
+</body>
+<HTML>
