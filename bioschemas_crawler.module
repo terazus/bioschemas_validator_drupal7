@@ -13,8 +13,6 @@
 require_once 'easyrdf/lib/EasyRdf.php';
 require_once 'easyrdf/vendor/autoload.php';
 require_once 'classes/BSCProcessor.php';
-require_once 'classes/IDEInterpreter.php';
-
 
 function bioschemas_crawler_menu(){
 	$items['bioschemas_crawler'] = array( 
