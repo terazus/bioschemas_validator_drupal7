@@ -5,19 +5,34 @@ class BSCsubProcessor extends BSCProcessor{
 	var $sublevel;
 	var $field_name;
 
-	function __construct($json, $field_name, $level) {
+	function __construct($json, $field_name, $level, $type_expected) {
 		if (!isset($json)){
 			$this->errors=TRUE;
 		}
-		else { 
+		else {
 			$this->values = $json;
 			$this->field_name = $field_name;
 			$this->sublevel = $level;
 			$this->template_fields = get_template(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})));
 			$padding = 20*($this->sublevel-1);
+			$padding_plus = $padding+20;
 			$padding = $padding.'px';
+			$padding_plus = $padding_plus.'px';
+
+
 			if ($this->template_fields!=null){
-				$result = $this->validate_json($this->values);
+
+				if (!in_array(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})), $type_expected)){
+					$result = '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"></td><td class="field_name error_field" style="padding-left:'.$padding_plus.'"> @type </td><td class="field_value error_field">'.$json->{"@type"}.'</td> </tr>';
+					$error = array('field'=>$field_name,
+						   'error'=>$json->{'@type'}.' not a valid target for this field');
+					array_push($this->error, $error);
+				}
+				else{
+					$result = '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding_plus.'"> @type </td><td class="field_value">'.$json->{'@type'}.'</td></tr>';
+				}
+
+				$result .= $this->validate_json($this->values);
 				if (count($this->error)>0) {
 					$this->message_output = '
 					<tr class="table_line">
