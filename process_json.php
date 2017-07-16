@@ -84,6 +84,13 @@ $input_format = $_GET['format'];
 
     foreach ($script as $item) {    
       $json = $item->nodeValue;
+
+      /* THis bit is for an IFB webpage where the json-ld is not valid (should be removed once the page is updated*/
+      if (json_decode($json)==NULL){
+        $json = substr($json, 0, -5);
+        $json = preg_replace('/[\x00-\x1F-\xFF]/', '', $json);
+      }
+
       if (isset(json_decode($json)->{'@graph'})){
         foreach (json_decode($json)->{'@graph'} as $newtool){
           $tool = new BSCProcessor($newtool);

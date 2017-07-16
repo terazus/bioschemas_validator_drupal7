@@ -22,7 +22,7 @@ class BSCsubProcessor extends BSCProcessor{
 
 			if ($this->template_fields!=null){
 
-				if (!in_array(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})), $type_expected)){
+				if (!in_array(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})), $type_expected) and isset($type_expected)){
 					$result = '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"></td><td class="field_name error_field" style="padding-left:'.$padding_plus.'"> @type </td><td class="field_value error_field">'.$json->{"@type"}.'</td> </tr>';
 					$error = array('field'=>$field_name,
 						   'error'=>$json->{'@type'}.' not a valid target for this field');
