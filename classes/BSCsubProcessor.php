@@ -5,7 +5,7 @@ class BSCsubProcessor extends BSCProcessor{
 	var $sublevel;
 	var $field_name;
 
-	function __construct($json, $field_name, $level, $type_expected) {
+	function __construct($json, $field_name, $level, $type_expected, $field_description) {
 		if (!isset($json)){
 			$this->errors=TRUE;
 		}
@@ -47,10 +47,11 @@ class BSCsubProcessor extends BSCProcessor{
 						<td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td>
 						<td class="field_name field_warning" style="padding-left:'.$padding.'">'.$this->field_name.'</td> 
 						<td class="field_value field_warning">'.json_encode($this->warning[0]['warning']).'</td>
+						<td class="field_description">'.$field_description.'</td>
 					</tr>'.$result;
 				}
 				else {
-					$this->message_output = '<tr class="table_line"><td class="fa first_col fa-check-circle"></td><td class="field_name" style="padding-left:'.$padding.'">'.$this->field_name.'</td> <td class="object_errors"></td> </tr>'.$result;
+					$this->message_output = '<tr class="table_line"><td class="fa first_col fa-check-circle"></td><td class="field_name" style="padding-left:'.$padding.'">'.$this->field_name.'</td> <td class="object_errors"></td> <td class="field_description">'.$field_description.'</td> </tr>'.$result;
 				}
 			}
 			else{

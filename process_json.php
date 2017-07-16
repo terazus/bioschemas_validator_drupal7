@@ -89,14 +89,14 @@ $input_format = $_GET['format'];
           $tool = new BSCProcessor($newtool);
           $insert_message = $tool->make_table();
           $message .= "<div class='bs_output'>".$insert_message."</div>";
-          //$message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode(json_decode($json)->{'@graph'}, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+          $message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode(json_decode($json)->{'@graph'}, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
         }
       }     
       else {
         $tool = new BSCProcessor(json_decode($json));
         $insert_message = $tool->make_table();
         $message .= "<div class='bs_output'>".$insert_message."</div>";
-        //$message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode(json_decode($json), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+        $message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode(json_decode($json), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
       }
     }
     return '<div class="container">'.$message.'</div>';

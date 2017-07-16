@@ -27,10 +27,10 @@ class BSCProcessor extends stdClass{
 		}
 		else { 
 			$this->values = $json;
-			$this->template_fields = get_template(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})));
+			$this->template_fields = get_template(strtolower(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"}))));
 			if ($this->template_fields!=null){
 				$result = $this->validate_json($this->values);
-				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th class="object_errors">'.count($this->error).' error(s) & '.
+				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th class="field_description"> </th> <th class="object_errors">'.count($this->error).' error(s) & '.
 				count($this->warning).' warning(s) </th> </tr>'.$result;
 			}
 			else{
@@ -54,7 +54,7 @@ class BSCProcessor extends stdClass{
 		foreach ($json as $field_name=>$field_value){
 			if ($field_name!='@context' and $field_name!='@id'){
 
-				if(gettype($field_value) == 'string'){
+				if(gettype($field_value) == 'string' and $field_name!='@type'){
 					$output .= $this->process_string_field($field_name, $field_value);
 				}
 
@@ -79,7 +79,7 @@ class BSCProcessor extends stdClass{
 						$local_error = array(
 							"field"=>$field_name,
 							"error"=>"Multiple values not allowed");
-						$output.='<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td>'.$field_name.' Multiple values are not allowed for that field </td></tr>';
+						$output.='<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td>'.$field_name.' Multiple values are not allowed for that field </td> <td class="field_description"></td> </tr>';
 						array_push($this->error, $local_error);
 					}
 				}
@@ -119,10 +119,12 @@ class BSCProcessor extends stdClass{
 	}
 
 	function process_object_field($field_value, $field_name, $level){
-		$subobject = new BSCsubProcessor($field_value, $field_name, $level);
+
+		$subobject = new BSCsubProcessor($field_value, $field_name, $level, $this->template_fields[$field_name]['values'], $this->template_fields[$field_name]['description']);
+
 		if (count($subobject->error)>0){
 			$error = array('field'=>$field_name,
-							'error'=>'error with subfield '.$subobject->error[0]['field']);
+						   'error'=>'error with subfield '.$subobject->error[0]['field']);
 			array_push($this->error, $error);
 		}
 		elseif (count($subobject->warning)>0){
@@ -130,7 +132,7 @@ class BSCProcessor extends stdClass{
 							'warning'=>'error with subfield '.$subobject->warning[0]['field']);
 			array_push($this->warning, $warning);
 		}
-		$message = $subobject->message_output;
+		$message .= $subobject->message_output;	
 		return $message; 
 	}
 
@@ -151,8 +153,8 @@ class BSCProcessor extends stdClass{
 		}
 
 
-		elseif (typeof($field_value) == $this->template_fields[$field_name]['type']){
-			$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$field_value.'</td></tr>';
+		elseif (in_array(typeof($field_value), $this->template_fields[$field_name]['type'])){
+			$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$field_value.'</td> <td class="field_description">'.$this->template_fields[$field_name]['description'].'<td></tr>';
 		}
 
 		else{
