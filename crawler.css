@@ -1,77 +1,16 @@
-body.page-bioschemas-crawler h1.page-header{
-	display: none;
+/* PAGE STYLE */
+body.page-bioschemas-crawler{
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	padding:5px;
 }
 
-body.page-bioschemas-crawler header#navbar{
-	width:100%;
-	max-width:100%;
-	margin-top: 0px;
-	position: relative;
-}
-
-body.page-bioschemas-crawler header#navbar a.name{
-	position: relative;
-	top:35px;
-	font-size: 30px;
-}
-
-body.page-bioschemas-crawler aside{
-	width:15%;
-}
-
-body.page-bioschemas-crawler div#navbar-collapse{
-	width: 30%;
-	display: inline-block !important;
-	float: right;
-	height: 100px !important;
-	padding:10px;
-}
-
-body.page-bioschemas-crawler div#navbar-collapse h2{
-	display: none;
-}
-
-form#user-login-form div.form-item{
-	width:50%;
-	display: inline-block;	
-}
-
-form#user-login-form ul{
-	display:none;
-}
-
-form#user-login-form div#edit-actions{
-	display: inline-block;
-	position: relative;
-	top: -8px;
-	left: 1px;
-}
-
-form#user-login-form div.form-item input, form#user-login-form div#edit-actions button, form#bioschemas-crawler-form  textarea{
-	border-radius: 0px;
-}
-
-div.main-container{
+body.page-bioschemas-crawler div.container{
 	width:100%;
 }
 
-div#page{
-	min-height: 100vh;
-}
 
-div#main-wrapper{
-	min-height:71vh;
-}
 
-div#content{
-	padding:0px;
-	width:100% !important;
-	display:inline-block;
-}
-
-div.section{
-	padding:0px !important;
-}
+/* FORM STYLING */
 
 form#bioschemas-crawler-form{
 	width: 100%;
@@ -96,8 +35,8 @@ form#bioschemas-crawler-form select{
 	left:1px;
 }
 
-form#bioschemas-crawler-form button{
-	width: 15%;
+form#bioschemas-crawler-form input#edit-submit{
+	width: 14%;
 	border-radius: 0px;
 	height: 60px;
 	margin: 0px;
@@ -106,6 +45,17 @@ form#bioschemas-crawler-form button{
     top: -4px;
     left: 2px;
     font-size: 22px;
+    background-color: #7bb5dd;
+    border-color: #7bb5dd;
+    background-image: none;
+}
+
+body.page-bioschemas-crawler form input#edit-submit:focus,
+body.page-bioschemas-crawler form input#edit-submit:active,
+body.page-bioschemas-crawler form input#edit-submit:hover
+{
+	background-color: #204d74 !important;
+    border-color: #122b40 !important;
 }
 
 form#bioschemas-crawler-form div.form-item-target-url{
@@ -118,22 +68,28 @@ form#bioschemas-crawler-form div.form-item-target-format{
 	display:inline-block;
 }
 
+
+
+/*   RESULT STYLING   */
+
+
 div.bs_output{
 	margin-top: 20px;
-	width:40%;
+	width:60%;
 	display: inline-block;
 	vertical-align: top;
-	font-size:16px;
+	font-size:14px;
 }
 
 div.json_display pre{
 	overflow: auto;
  	word-wrap: normal;
   	white-space: pre;
+  	font-size: 12px;
 }
 
 div.json_display{
-	width:59%;
+	width:39%;
 	display: inline-block;
 	vertical-align: top;
 	border:1px solid #ccc;
@@ -143,7 +99,7 @@ div.json_display{
 }
 
 
-/*      */
+
 
 table.bioschemas_validation{
 	width:100%;
@@ -214,4 +170,12 @@ div.bs_output td.error_field{
 
 div.bs_output td.field_warning{
 	color:orange;
+}
+
+div.bs_output .field_description{
+	padding-left: 20px;
+	padding-right: 20px;
+	font-size: 12px;
+	font-style: italic;
+	/*display:none !important;*/
 }

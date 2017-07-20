@@ -169,6 +169,7 @@ function prepare_subjson($myjson, $sub_json){
 
 function display_result(&$form_state){
 
+
 	$allowed_main_object = array('softwareapplication', 'event');
 	$message = '<div> <HR>';
 
