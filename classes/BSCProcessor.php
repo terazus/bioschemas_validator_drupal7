@@ -51,6 +51,7 @@ class BSCProcessor extends stdClass{
 		$output = '';
 		$output = '' ;
 
+		/* For each field in the json */
 		foreach ($json as $field_name=>$field_value){
 			if ($field_name!='@context' and $field_name!='@id'){
 
@@ -109,7 +110,7 @@ class BSCProcessor extends stdClass{
 					// REQUIRED FIELD MISSING ERROR
 					$local_warning = array(
 							"field"=>$field_name,
-							"warning"=>"Required field missing");
+							"warning"=>"A recommended field missing");
 					$output .= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning"> A recommended field is missing </td> </tr>';
 					array_push($this->warning, $local_warning);
 				}
@@ -145,7 +146,7 @@ class BSCProcessor extends stdClass{
 
 		// UNSUPPORTED STRING FIELD WARNING
 		if (!isset($this->template_fields[$field_name])){
-			$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning">'.$field_value.' </td> </tr>';
+			$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning">'.$field_value.' </td> <td class="field_description field_warning"> This field isn\'t supported by Bioschemas</td></tr>';
 			$local_warning = array(
 						'field'=>$field_name,
 						'error'=>'Field not supported');
