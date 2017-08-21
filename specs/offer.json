@@ -1,0 +1,27 @@
+{
+
+  "title":"Offer",
+
+  "type": "object",
+
+  "properties": {
+
+    "price":{
+      "description" : "Price of the tool. Fill 0.00 if free. If you have price bundles (freemium model for instance), you may create a new offer for each bundle",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    },
+    "priceCurrency": {
+      "description" : "Currency accepted for the payment and for that specific amount (prices may differ depending on the currency)",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    }
+  },
+  "recommended": [
+    "priceCurrency",
+    "price"
+  ]
+}
+

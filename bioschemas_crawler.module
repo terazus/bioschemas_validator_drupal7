@@ -13,6 +13,7 @@
 require_once 'easyrdf/lib/EasyRdf.php';
 require_once 'easyrdf/vendor/autoload.php';
 require_once 'classes/BSCProcessor.php';
+require_once('PHP-Microdata/MicrodataParser.php');
 
 function bioschemas_crawler_menu(){
 	$items['bioschemas_crawler'] = array( 
@@ -194,6 +195,11 @@ function display_result(&$form_state){
 				}
 				
 			}
+		}
+		elseif($form_state['input']['target_format']=='microdata'){
+			$test = new MicrodataParser($form_state['input']['target_url']);
+			$json = $test->getJson();
+			dpm(json_decode($json));
 		}
 
 		elseif ($form_state['input']['target_format']=='jsonld'){

@@ -76,7 +76,7 @@
         }
       ]
     },
-    "citation" : {
+    "Citation" : {
       "description" : "Article that uses or quotes this tool. This field expects a CreativeWork object.",
       "oneOf":[
         {
@@ -102,7 +102,7 @@
         }
       ]
     },
-    "licence": {
+    "license": {
       "description" : "An EDAM operation ID or URL",
       "oneOf": [
         {"type":"string"},
@@ -276,7 +276,7 @@
   "recommended": [
     "publisher",
     "citation",
-    "licence"
+    "license"
   ],
   "optional":[
     "applicationCategory",
