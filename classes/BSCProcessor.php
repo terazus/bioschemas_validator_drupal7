@@ -27,7 +27,13 @@ class BSCProcessor extends stdClass{
 		}
 		else { 
 			$this->values = $json;
-			$this->template_fields = get_template(strtolower(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"}))));
+			$file_name = strtolower(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})));
+			$this->template_fields = get_template($file_name);
+
+			$path = './sites/all/modules/bioschemas_crawler/specs/';
+			$spec_path = $path.$file_name.'.json';
+			$this->template_fields = $this->make_spec($spec_path);
+
 			if ($this->template_fields!=null){
 				$result = $this->validate_json($this->values);
 				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th class="field_description"> </th> <th class="object_errors">'.count($this->error).' error(s) & '.
@@ -38,6 +44,63 @@ class BSCProcessor extends stdClass{
 				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.' (UNSUPPORTED OBJECT) </th> <th></th> </tr>'.$result;
 			}
 		}
+	}
+
+	function make_spec($file_path){
+		$raw_spec = json_decode(file_get_contents($file_path));
+
+		dpm($raw_spec);
+
+		$properties = $raw_spec->{'properties'};
+		$spec = array();
+		foreach ($properties as $property_name => $property_spec) {
+			$field_spec = array();
+
+			if (in_array($property_name, $raw_spec->{'required'})){
+				$field_spec['presence'] = 'required';
+			}
+			elseif (in_array($property_name, $raw_spec->{'recommended'})){
+				$field_spec['presence'] = 'recommended';
+			}
+			elseif (in_array($property_name, $raw_spec->{'optional'})){
+				$field_spec['presence'] = 'optional';
+			}
+
+			$field_spec['description'] = $property_spec->{'description'};
+
+			if (sizeof($property_spec->{'oneOf'})==1){
+				$field_spec['cardinality'] = false;
+			}
+			elseif (sizeof($property_spec->{'oneOf'})==2){
+				$field_spec['cardinality'] = true;
+			}
+
+			$field_spec['type'] = array();
+			foreach ($property_spec->{'oneOf'} as $type_value){
+				if (!in_array($type_value->{'type'}, $field_spec['type']) and $type_value->{'type'}!='array'){			
+					if ($type_value->{'type'} =='object'){
+						array_push($field_spec['type'], $type_value->{'type'});
+						$field_values = array(); 
+						foreach($type_value->{'properties'}->{'type'}->{'enum'} as $value){
+							array_push($field_values, str_replace('http://schema.org/', '', $value));
+						}
+						$field_spec['values'] = $field_values;
+					}
+					elseif ($type_value->{'type'} =='string'){
+						if (isset($type_value->{'format'})){
+							array_push($field_spec['type'], $type_value->{'format'});
+						}
+						else{
+							array_push($field_spec['type'], $type_value->{'type'});
+						}
+					}
+				}
+			}
+
+			$spec[$property_name] =  $field_spec;
+		}
+
+		return $spec;
 	}
 
 	function make_table(){
@@ -107,7 +170,7 @@ class BSCProcessor extends stdClass{
 			elseif ($field_value['presence'] == 'recommended'){
 				if (!isset($json->{$field_name})){
 
-					// REQUIRED FIELD MISSING ERROR
+					// RECOMMENDED FIELD MISSING ERROR
 					$local_warning = array(
 							"field"=>$field_name,
 							"warning"=>"A recommended field missing");
