@@ -28,8 +28,6 @@ class BSCProcessor extends stdClass{
 		else { 
 			$this->values = $json;
 			$file_name = strtolower(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})));
-			$this->template_fields = get_template($file_name);
-
 			$path = './sites/all/modules/bioschemas_crawler/specs/';
 			$spec_path = $path.$file_name.'.json';
 			$this->template_fields = $this->make_spec($spec_path);
@@ -48,9 +46,6 @@ class BSCProcessor extends stdClass{
 
 	function make_spec($file_path){
 		$raw_spec = json_decode(file_get_contents($file_path));
-
-		dpm($raw_spec);
-
 		$properties = $raw_spec->{'properties'};
 		$spec = array();
 		foreach ($properties as $property_name => $property_spec) {
