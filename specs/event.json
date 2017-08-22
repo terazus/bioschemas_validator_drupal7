@@ -13,12 +13,18 @@
     },
     "startDate": {
       "oneOf": [
-        {"type": "string"}
+        {
+          "type": "string",
+          "format": "date"
+        }
       ]
     },
     "endDate": {
       "oneOf": [
-        {"type": "string"}
+        {
+          "type": "string",
+          "format": "date"
+        }
       ]
     },
     "description": {

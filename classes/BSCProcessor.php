@@ -28,7 +28,10 @@ class BSCProcessor extends stdClass{
 		else { 
 			$this->values = $json;
 			$file_name = strtolower(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})));
-			$path = './sites/all/modules/bioschemas_crawler/specs/';
+			if (!isset($json->{"@type"})){
+				$file_name = strtolower(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"_type"})));
+			}
+			$path = './sites/all/modules/CUSTOM/bioschemas_crawler/specs/';
 			$spec_path = $path.$file_name.'.json';
 			$this->template_fields = $this->make_spec($spec_path);
 
@@ -36,10 +39,17 @@ class BSCProcessor extends stdClass{
 				$result = $this->validate_json($this->values);
 				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th class="field_description"> </th> <th class="object_errors">'.count($this->error).' error(s) & '.
 				count($this->warning).' warning(s) </th> </tr>'.$result;
+				if (!isset($json->{"@type"})){
+					$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'_type'}.'</th> <th class="field_description"> </th> <th class="object_errors">'.count($this->error).' error(s) & '.
+					count($this->warning).' warning(s) </th> </tr>'.$result;
+				}
 			}
 			else{
 				$result = $this->validate_json($this->values);
 				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.' (UNSUPPORTED OBJECT) </th> <th></th> </tr>'.$result;
+				if (!isset($json->{"@type"})){
+					$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'_type'}.' (UNSUPPORTED OBJECT) </th> <th></th> </tr>'.$result;
+				}
 			}
 		}
 	}

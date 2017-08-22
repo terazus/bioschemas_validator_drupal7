@@ -198,8 +198,13 @@ function display_result(&$form_state){
 		}
 		elseif($form_state['input']['target_format']=='microdata'){
 			$test = new MicrodataParser($form_state['input']['target_url']);
-			$json = $test->getJson();
-			dpm(json_decode($json));
+			$json = json_decode($test->getJson());
+			foreach ($json as $object){
+				$validated_object = new BSCProcessor($object);
+				$insert_message = $validated_object->make_table();
+				$message .= "<div class='bs_output'>".$insert_message."</div>";
+				$message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode($object, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+			}
 		}
 
 		elseif ($form_state['input']['target_format']=='jsonld'){
