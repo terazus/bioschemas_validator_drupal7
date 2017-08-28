@@ -7,7 +7,6 @@
 // add a <td> (after field_name, to emulate a field_value <td>) for <tr> that have mouseover issues
 
 
-require_once 'objects_templates.php';
 require_once 'BSCsubProcessor.php';
 
 
