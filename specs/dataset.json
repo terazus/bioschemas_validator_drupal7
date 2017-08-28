@@ -1,0 +1,21 @@
+{
+
+  "title":"Dataset",
+
+  "type": "object",
+
+  "properties": {
+    "additionalType": {
+      "description" : "Fill in an url to an EDAM term",
+      "oneOf": [
+        {
+          "type":"string",
+          "format":"uri"
+        }
+      ]
+    }
+  },
+  "required":[
+    "additionalType"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+
+  "title":"ControlAction",
+
+  "type": "object",
+
+  "properties": {
+    "object" : {
+      "description" : "Input of the tool. A Dataset field is expected here.",
+      "oneOf":[
+        {
+          "type": "object",
+          "properties":{
+            "type":{
+              "type": "string",
+              "enum": ["http://schema.org/Dataset"]
+            }
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties" : {
+              "type": {
+                "type": "string",
+                "enum": ["http://schema.org/Dataset"]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "result" : {
+      "description" : "Output of the tool. A Dataset field is expected here.",
+      "oneOf":[
+        {
+          "type": "object",
+          "properties":{
+            "type":{
+              "type": "string",
+              "enum": ["http://schema.org/Dataset"]
+            }
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties" : {
+              "type": {
+                "type": "string",
+                "enum": ["http://schema.org/Dataset"]
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "recommended": [
+    "result",
+    "object"
+  ]
+}

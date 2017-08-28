@@ -13,18 +13,14 @@ class BSCsubProcessor extends BSCProcessor{
 			$this->values = $json;
 			$this->field_name = $field_name;
 			$this->sublevel = $level;
-			$this->template_fields = get_template(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})));
 			$padding = 20*($this->sublevel-1);
 			$padding_plus = $padding+20;
 			$padding = $padding.'px';
 			$padding_plus = $padding_plus.'px';
 
-			$path = './sites/all/modules/bioschemas_crawler/specs/';
-			$spec_path = $path.strtolower(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"}))).'.json';
-			if(strtolower(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"}))) == 'person'){
-				$this->template_fields = $this->make_spec($spec_path);
-			}
-
+			$path = './sites/all/modules/CUSTOM/bioschemas_crawler/specs/';
+			$spec_path = $path.strtolower(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"}))).'.json';			
+			$this->template_fields = $this->make_spec($spec_path);
 
 			if ($this->template_fields!=null){
 
