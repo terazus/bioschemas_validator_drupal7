@@ -54,12 +54,11 @@ class BSCsubProcessor extends BSCProcessor{
 						<td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td>
 						<td class="field_name field_warning" style="padding-left:'.$padding.'">'.$this->field_name.'</td> 
 						<td class="field_value field_warning">'.json_encode($this->warning[0]['warning']).'</td>
-						<td class="field_description">'.$field_description.'</td>
 					</tr>'.$result;
 				}
 				/* There's no error and no warning */
 				else {
-					$this->message_output = '<tr class="table_line"><td class="fa first_col fa-check-circle"></td><td class="field_name" style="padding-left:'.$padding.'">'.$this->field_name.'</td> <td class="object_errors"></td> <td class="field_description">'.$field_description.'</td> </tr>'.$result;
+					$this->message_output = '<tr class="table_line"><td class="fa first_col fa-check-circle"></td><td class="field_name" style="padding-left:'.$padding.'">'.$this->field_name.'</td> <td class="object_errors"></td> </tr>'.$result;
 				}
 			}
 

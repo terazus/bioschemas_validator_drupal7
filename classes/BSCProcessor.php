@@ -36,10 +36,10 @@ class BSCProcessor extends stdClass{
 
 			if ($this->template_fields!=null){
 				$result = $this->validate_json($this->values);
-				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th class="field_description"> </th> <th class="object_errors">'.count($this->error).' error(s) & '.
+				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th class="object_errors">'.count($this->error).' error(s) & '.
 				count($this->warning).' warning(s) </th> </tr>'.$result;
 				if (!isset($json->{"@type"})){
-					$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'_type'}.'</th> <th class="field_description"> </th> <th class="object_errors">'.count($this->error).' error(s) & '.
+					$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'_type'}.'</th> <th class="object_errors">'.count($this->error).' error(s) & '.
 					count($this->warning).' warning(s) </th> </tr>'.$result;
 				}
 			}
@@ -147,7 +147,7 @@ class BSCProcessor extends stdClass{
 						$local_error = array(
 							"field"=>$field_name,
 							"error"=>"Multiple values not allowed");
-						$output.='<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td>'.$field_name.' Multiple values are not allowed for that field </td> <td class="field_description"></td> </tr>';
+						$output.='<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td>'.$field_name.' Multiple values are not allowed for that field </td> </tr>';
 						array_push($this->error, $local_error);
 					}
 				}
@@ -214,7 +214,7 @@ class BSCProcessor extends stdClass{
 
 		// UNSUPPORTED STRING FIELD WARNING
 		if (!isset($this->template_fields[$field_name])){
-			$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning">'.$field_value.' </td> <td class="field_description field_warning"> This field isn\'t supported by Bioschemas</td></tr>';
+			$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning">'.$field_value.' </td> </tr>';
 			$local_warning = array(
 						'field'=>$field_name,
 						'error'=>'Field not supported');
@@ -223,7 +223,7 @@ class BSCProcessor extends stdClass{
 
 
 		elseif (in_array(typeof($field_value), $this->template_fields[$field_name]['type'])){
-			$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$field_value.'</td> <td class="field_description">'.$this->template_fields[$field_name]['description'].'<td></tr>';
+			$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$field_value.'</td> </tr>';
 		}
 
 		else{

@@ -72,10 +72,23 @@ form#bioschemas-crawler-form div.form-item-target-format{
 
 /*   RESULT STYLING   */
 
+@media(max-width: 1200px){
+	div.bs_output, div.json_display{
+		width:100%;
+	}
+}
+
+@media(min-width: 1201px){
+	div.bs_output{
+		width:60%;
+	}
+	div.json_display {
+		width:39%;
+	}
+}
 
 div.bs_output{
 	margin-top: 20px;
-	width:60%;
 	display: inline-block;
 	vertical-align: top;
 	font-size:14px;
@@ -89,7 +102,6 @@ div.json_display pre{
 }
 
 div.json_display{
-	width:39%;
 	display: inline-block;
 	vertical-align: top;
 	border:1px solid #ccc;
@@ -102,7 +114,7 @@ div.json_display{
 
 
 table.bioschemas_validation{
-	width:100%;
+	/*width:100%;*/
 	border-collapse: collapse;
 }
 
