@@ -188,8 +188,8 @@ class BSCProcessor extends stdClass{
 
 	function process_object_field($field_value, $field_name, $level){
 
+		$field_name = str_replace('http://schema.org/', '', $field_name);
 		$subobject = new BSCsubProcessor($field_value, $field_name, $level, $this->template_fields[$field_name]['values'], $this->template_fields[$field_name]['description']);
-
 		if (count($subobject->error)>0){
 			$error = array('field'=>$field_name,
 						   'error'=>'error with subfield '.$subobject->error[0]['field']);
@@ -197,7 +197,7 @@ class BSCProcessor extends stdClass{
 		}
 		elseif (count($subobject->warning)>0){
 			$warning = array('field'=>$field_name,
-							'warning'=>'error with subfield '.$subobject->warning[0]['field']);
+							'warning'=>'warning with subfield '.$subobject->warning[0]['field']);
 			array_push($this->warning, $warning);
 		}
 		$message .= $subobject->message_output;	
@@ -205,6 +205,7 @@ class BSCProcessor extends stdClass{
 	}
 
 	function process_string_field($field_name, $field_value){
+		$field_name = str_replace('_', '@', $field_name);
 		$output = '';
 
 		$padding = $this->sublevel*20;

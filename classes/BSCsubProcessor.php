@@ -6,6 +6,7 @@ class BSCsubProcessor extends BSCProcessor{
 	var $field_name;
 
 	function __construct($json, $field_name, $level, $type_expected, $field_description) {
+		$field_name = str_replace('https://schema.org/', '', str_replace('http://schema.org/', '', str_replace('_', '@', $field_name))) ; 
 		if (!isset($json)){
 			$this->errors=TRUE;
 		}
@@ -65,7 +66,7 @@ class BSCsubProcessor extends BSCProcessor{
 			/* Couldn't load the template : the field isn't supported by Bioschemas */
 			else{
 				$result = $this->validate_json($this->values);
-				$this->message_output = '<tr class="table_line"><td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$this->values->{'@type'}.'</td> <td class="field_value field_warning">This field is not supported by Bioschemas</td> </tr>'.$result;
+				$this->message_output = '<tr class="table_line"><td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td> <td class="field_value field_warning">This field is not supported by Bioschemas</td> </tr>'.$result;
 			}
 		}
 	}	
