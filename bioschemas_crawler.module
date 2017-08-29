@@ -13,7 +13,7 @@
 require_once 'easyrdf/lib/EasyRdf.php';
 require_once 'easyrdf/vendor/autoload.php';
 require_once 'classes/BSCProcessor.php';
-require_once('PHP-Microdata/MicrodataParser.php');
+require_once 'PHP-Microdata/MicrodataParser.php';
 
 function bioschemas_crawler_menu(){
 	$items['bioschemas_crawler'] = array( 
@@ -87,7 +87,7 @@ function bioschemas_crawler_form($form, &$form_state){
 	return $form;
 }
 
-function prepare_json($json_input){
+function prepare_RDFA($json_input){
 	$new_json = array();
 
 	// for each item in the json (relinking data together)
@@ -127,7 +127,7 @@ function prepare_json($json_input){
 	return $new_json;	
 }
 
-function prepare_subjson($myjson, $sub_json){
+function prepare_subRDFA($myjson, $sub_json){
 	$new_json = new stdClass;
 
 	foreach($sub_json as $sub_field=>$sub_value){
@@ -168,6 +168,36 @@ function prepare_subjson($myjson, $sub_json){
 	return $new_json;
 }
 
+function prepare_Microdata($json){
+	$processed_json = array();
+
+	foreach ($json as $object){
+
+		$object_as_json = new stdClass;
+
+		foreach ($object as $field_name=>$field_value){
+			if ($field_name != '_class'){
+				if(gettype($field_value)!='object'){
+					$object_as_json->{str_replace('_', '@', $field_name)} = $field_value;
+				}
+
+				else{
+					$subobject_as_json = new stdClass;
+					foreach ($field_value as $subfield_name=>$subfield_value){
+						if ($subfield_name != '_class'){
+							$subobject_as_json->{str_replace('_', '@', $subfield_name)} = $subfield_value;
+						}
+					}
+					$object_as_json->{str_replace('http://schema.org/', '', $field_name)} = $subobject_as_json;
+				}
+			}
+		}
+
+		array_push($processed_json, $object_as_json);
+	}
+	return $processed_json;
+}
+
 function display_result(&$form_state){
 
 
@@ -182,10 +212,10 @@ function display_result(&$form_state){
 			$options = array('compact'=>true);
 			$serialiser = new EasyRdf_Serialiser_JsonLd();
 			$myjson = json_decode($serialiser->serialise($json_input, 'jsonld', $options));
-			$myjson = prepare_json($myjson->{'@graph'});
+			$myjson = prepare_RDFA($myjson->{'@graph'});
 
 			foreach($myjson as $sub_json){
-				$new_json = prepare_subjson($myjson, $sub_json);
+				$new_json = prepare_subRDFA($myjson, $sub_json);
 				if (in_array(strtolower(str_replace('https://schema.org/', '', str_replace('http://schema.org/', '', $new_json->{'@type'}))), $allowed_main_object)){			
 					$tool = new BSCProcessor($new_json);
 					$insert_message = $tool->make_table();
@@ -197,8 +227,10 @@ function display_result(&$form_state){
 			}
 		}
 		elseif($form_state['input']['target_format']=='microdata'){
-			$test = new MicrodataParser($form_state['input']['target_url']);
-			$json = json_decode($test->getJson());
+			$raw_json = new MicrodataParser($form_state['input']['target_url']);
+			$json = json_decode($raw_json->getJson());
+			$json = prepare_Microdata($json);
+
 			foreach ($json as $object){
 				$validated_object = new BSCProcessor($object);
 				$insert_message = $validated_object->make_table();
