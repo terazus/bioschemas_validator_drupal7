@@ -58,6 +58,7 @@ class BSCProcessor extends stdClass{
 		$properties = $raw_spec->{'properties'};
 		$spec = array();
 		foreach ($properties as $property_name => $property_spec) {
+
 			$field_spec = array();
 
 			if (in_array($property_name, $raw_spec->{'required'})){
@@ -75,7 +76,7 @@ class BSCProcessor extends stdClass{
 			if (sizeof($property_spec->{'oneOf'})==1){
 				$field_spec['cardinality'] = false;
 			}
-			elseif (sizeof($property_spec->{'oneOf'})==2){
+			elseif (sizeof($property_spec->{'oneOf'})>1){
 				$field_spec['cardinality'] = true;
 			}
 
@@ -97,13 +98,20 @@ class BSCProcessor extends stdClass{
 						else{
 							array_push($field_spec['type'], $type_value->{'type'});
 						}
+
+						if (isset($type_value->{'enum'})){
+							$field_spec['controlled_vocabulary'] = array();
+							foreach ($type_value->{'enum'} as $vocabulary_item){
+								array_push($field_spec['controlled_vocabulary'], $vocabulary_item);
+								
+							}
+						}
 					}
 				}
 			}
 
 			$spec[$property_name] =  $field_spec;
 		}
-
 		return $spec;
 	}
 
@@ -147,7 +155,7 @@ class BSCProcessor extends stdClass{
 						$local_error = array(
 							"field"=>$field_name,
 							"error"=>"Multiple values not allowed");
-						$output.='<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td>'.$field_name.' Multiple values are not allowed for that field </td> </tr>';
+						$output.='<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value error_field"> Multiple values are not allowed for that field </td> </tr>';
 						array_push($this->error, $local_error);
 					}
 				}
@@ -212,6 +220,8 @@ class BSCProcessor extends stdClass{
 		$padding = $padding.'px';
 		$output = '';
 
+		$edam_API_URL = 'https://biosphere.france-bioinformatique.fr/edamontology/';
+
 		// UNSUPPORTED STRING FIELD WARNING
 		if (!isset($this->template_fields[$field_name])){
 			$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning">'.$field_value.' </td> </tr>';
@@ -223,7 +233,49 @@ class BSCProcessor extends stdClass{
 
 
 		elseif (in_array(typeof($field_value), $this->template_fields[$field_name]['type'])){
-			$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$field_value.'</td> </tr>';
+			if (!isset($this->template_fields[$field_name]['controlled_vocabulary'])){
+				$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$field_value.'</td> </tr>';
+			}
+
+			// Start processing controlled vocabulary: size() = 1 => EDAM TERM if size > 1 => not EDAM TERM 
+			else{
+
+				// Deal with EDAM TERMS
+				if (sizeof($this->template_fields[$field_name]['controlled_vocabulary']) == 1){
+					$expected_table = strtolower(str_replace('EDAM/','', $this->template_fields[$field_name]['controlled_vocabulary'])[0]);
+
+					$term_id = str_replace('http://edamontology.org/' ,'',$field_value);
+					$term = explode('_', $term_id);
+					$edam_api = $edam_API_URL.$expected_table.'/'.$term[1].'/?media=json';
+					if ($term[0]!=$expected_table){
+						//Warning
+						$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning"> Provided term is from the wrong table (got '.$term[0].' but expects '.$expected_table.').</td> </tr>';
+					}
+					else{
+						$term_api_call = file_get_contents($edam_api);
+						if($term_api_call==false){
+							// Warning
+							$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning"> Provided ID does not exist (got '.$term[1].').</td> </tr>';
+						}
+						else{
+							$term_values = json_decode($term_api_call);
+							dpm($term_values->{'title'});
+							$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$term_values->{'title'}.' (id '.$term[1].')</td> </tr>';
+						}
+					}
+				}
+
+				// Non EDAM CV
+				elseif($this->template_fields[$field_name]['controlled_vocabulary'] > 1){
+					if (!in_array($field_value, $this->template_fields[$field_name]['controlled_vocabulary'])){
+						$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning">'.$field_value.' is not compliant with controlled vocabulary.</td> </tr>';
+					}
+					else{
+						$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$field_value.'</td> </tr>';
+					}
+				}
+
+			}
 		}
 
 		else{

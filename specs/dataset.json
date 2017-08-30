@@ -10,7 +10,8 @@
       "oneOf": [
         {
           "type":"string",
-          "format":"uri"
+          "format":"uri",
+          "enum":["EDAM/Format"]
         }
       ]
     }
