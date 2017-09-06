@@ -1,26 +1,45 @@
 <?php
-
-// TODO: create new object when a @type is detected
-// enable to pick up errors and warnings to put into the table header
-// create templates for every supported object
-// check for missing required and recommended fields 
-// add a <td> (after field_name, to emulate a field_value <td>) for <tr> that have mouseover issues
-
+/**
+ * JSON-LD library which reads JSON-LD Bioschemas markup variables and checks each field restrictions
+ * @package BioschemasProcessor
+ * @author Batista Dominique <batistadominique@hotmail.com>
+ * @copyright 2017
+ */
 
 require_once 'BSCsubProcessor.php';
 
+/**
+ * Class: BSCProcessor
+ * Implements a simple parser which loads a JSON-LD variable and checks every field for:
+ * - presence (required, recommended or optionnal),
+ * - terms under controlled vocabularies
+ * - cardinality
+ * - value type
+ * 
+ * Specifications are loaded from corresponding files under the /specs/ directory. 
+ *
+ * @package BioschemasProcessor
+ */
 
 class BSCProcessor extends stdClass{
 
-	var $template_fields;
-	var $message_output = '';
-	var $values;
-	var $error = array();
-	var $warning = array();
-	var $sublevel = 1;
+	protected $template_fields;
+	public $message_output = '';
+	protected $values;
+	public $error = array();
+	public $warning = array();
+	protected $sublevel = 1;
 
 
-	function __construct($json) {
+	/**
+	 * Constructor
+	 *
+	 * You should first make sure your JSON-lf variable is valid (use json_decode).
+	 *
+	 * @param 	object 	$json 			A json-ld variable containing the fields to process
+	 * @return 	object 	BSCProcessor
+	 */
+	public function __construct($json) {
 		if (!isset($json)){
 			$this->errors=TRUE;
 		}
@@ -53,7 +72,7 @@ class BSCProcessor extends stdClass{
 		}
 	}
 
-	function make_spec($file_path){
+	protected function make_spec($file_path){
 		$raw_spec = json_decode(file_get_contents($file_path));
 		$properties = $raw_spec->{'properties'};
 		$spec = array();
@@ -115,11 +134,12 @@ class BSCProcessor extends stdClass{
 		return $spec;
 	}
 
-	function make_table(){
+	public function make_table()
+	{
 		return '<table class="bioschemas_validation">'.$this->message_output.'</table>';
 	}
 
-	function validate_json($json){
+	protected function validate_json($json){
 
 		$padding = $this->sublevel*20;
 		$padding = $padding.'px';
@@ -194,7 +214,8 @@ class BSCProcessor extends stdClass{
 		return $output;
 	}
 
-	function process_object_field($field_value, $field_name, $level){
+	protected function process_object_field($field_value, $field_name, $level)
+	{
 
 		$field_name = str_replace('http://schema.org/', '', $field_name);
 		$subobject = new BSCsubProcessor($field_value, $field_name, $level, $this->template_fields[$field_name]['values'], $this->template_fields[$field_name]['description']);
@@ -212,7 +233,8 @@ class BSCProcessor extends stdClass{
 		return $message; 
 	}
 
-	function process_string_field($field_name, $field_value){
+	protected function process_string_field($field_name, $field_value)
+	{
 		$field_name = str_replace('_', '@', $field_name);
 		$output = '';
 
@@ -224,54 +246,57 @@ class BSCProcessor extends stdClass{
 
 		// UNSUPPORTED STRING FIELD WARNING
 		if (!isset($this->template_fields[$field_name])){
-			$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning">'.$field_value.' </td> </tr>';
-			$local_warning = array(
-						'field'=>$field_name,
-						'error'=>'Field not supported');
-			array_push($this->warning, $local_warning);
+			$output = $this->trigger_error($padding, $field_name, $field_value.' (this field is not supported by Bioschemas)');
 		}
 
 
-		elseif (in_array(typeof($field_value), $this->template_fields[$field_name]['type'])){
-			if (!isset($this->template_fields[$field_name]['controlled_vocabulary'])){
-				$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$field_value.'</td> </tr>';
+		elseif (in_array(typeof($field_value), $this->template_fields[$field_name]['type']))
+		{
+
+			if (!isset($this->template_fields[$field_name]['controlled_vocabulary']))
+			{
+				$output = $this->print_message($padding, $field_name, 'valid', $field_value);
 			}
 
 			// Start processing controlled vocabulary: size() = 1 => EDAM TERM if size > 1 => not EDAM TERM 
 			else{
 
 				// Deal with EDAM TERMS
-				if (sizeof($this->template_fields[$field_name]['controlled_vocabulary']) == 1){
+				if (sizeof($this->template_fields[$field_name]['controlled_vocabulary']) == 1)
+				{
 					$expected_table = strtolower(str_replace('EDAM/','', $this->template_fields[$field_name]['controlled_vocabulary'])[0]);
 
 					$term_id = str_replace('http://edamontology.org/' ,'',$field_value);
 					$term = explode('_', $term_id);
 					$edam_api = $edam_API_URL.$expected_table.'/'.$term[1].'/?media=json';
-					if ($term[0]!=$expected_table){
-						//Warning
-						$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning"> Provided term is from the wrong table (got '.$term[0].' but expects '.$expected_table.').</td> </tr>';
+
+					if ($term[0]!=$expected_table)
+					{
+						$output = $this->trigger_error($padding, $field_name, 'Provided term is from the wrong table (got '.$term[0].' but expects '.$expected_table.')');				
 					}
-					else{
+
+					else
+					{
 						$term_api_call = file_get_contents($edam_api);
 						if($term_api_call==false){
-							// Warning
-							$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning"> Provided ID does not exist (got '.$term[1].').</td> </tr>';
+							$output = $this->trigger_error($padding, $field_name, 'Provided ID does not exist (got '.$term[1].')');
 						}
 						else{
 							$term_values = json_decode($term_api_call);
-							dpm($term_values->{'title'});
-							$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$term_values->{'title'}.' (id '.$term[1].')</td> </tr>';
+							$output = $this->print_message($padding, $field_name, 'valid', $term_values->{'title'}.' (id '.$term[1].')');
 						}
 					}
 				}
 
 				// Non EDAM CV
-				elseif($this->template_fields[$field_name]['controlled_vocabulary'] > 1){
-					if (!in_array($field_value, $this->template_fields[$field_name]['controlled_vocabulary'])){
-						$output.= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning">'.$field_value.' is not compliant with controlled vocabulary.</td> </tr>';
+				elseif($this->template_fields[$field_name]['controlled_vocabulary'] > 1)
+				{
+					if (!in_array($field_value, $this->template_fields[$field_name]['controlled_vocabulary']))
+					{
+						$output = $this->trigger_error($padding, $field_name, $field_value.' is not compliant with controlled vocabulary');
 					}
 					else{
-						$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$field_value.'</td> </tr>';
+						$output = $this->print_message($padding, $field_name, 'valid', $field_value);
 					}
 				}
 
@@ -292,6 +317,59 @@ class BSCProcessor extends stdClass{
 		}
 		return $output;
 	}
+
+	protected function print_message($padding, $field_name, $field_state, $field_value)
+	{
+		// Choosing the icon
+		if ($field_state == 'valid')
+		{
+			$icon = 'fa-check-circle';
+			$field_css_class = 'valid_field';
+		}
+		elseif ($field_state == 'warning')
+		{
+			$icon = 'fa-exclamation-triangle';
+			$field_css_class = 'field_warning';
+		}
+		elseif ($field_state == 'error')
+		{
+			$icon = 'fa-times-circle';
+			$field_css_class = 'error_field';
+		}
+
+
+
+		// Build output
+		$output = '<tr class="table_line"> 
+			<td class="fa first_col '.$icon.'" aria-hidden="true"> </td>
+			<td class="field_name '.$field_css_class.'" style="padding-left:'.$padding.'">'.$field_name.'</td>
+			<td class="field_value '.$field_css_class.'">'.$field_value.'</td>
+		</tr>';
+
+		return $output;
+	}
+
+	protected function trigger_error($padding, $field_name, $field_value)
+	{
+		if ($this->template_fields[$field_name]['presence'] == 'required')
+		{	
+			$output = $this->print_message($padding, $field_name, 'error', $field_value);
+			$local_error = array(
+				'field'=>$field_name,
+				'error'=>$field_value);
+			array_push($this->error, $local_error);	
+		}
+		else
+		{
+			$output = $this->print_message($padding, $field_name, 'warning', $field_value);
+			$local_warning = array(
+				'field'=>$field_name,
+				'error'=>$field_value);
+			array_push($this->warning, $local_warning);
+		}
+		return $output;
+	} 
+
 }
 
 

@@ -23,39 +23,33 @@ class BSCsubProcessor extends BSCProcessor{
 			$spec_path = $path.strtolower(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"}))).'.json';			
 			$this->template_fields = $this->make_spec($spec_path);
 
+			// Subobject template can be loaded
 			if ($this->template_fields!=null){
 
 				/* Let's first check if the provided @type value is the expected type for this field */
 				if (!in_array(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})), $type_expected) and isset($type_expected)){
-					$result = '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"></td><td class="field_name error_field" style="padding-left:'.$padding_plus.'"> @type </td><td class="field_value error_field">'.$json->{"@type"}.'</td> </tr>';
-					$error = array('field'=>$field_name,
-						   'error'=>$json->{'@type'}.' not a valid target for this field');
-					array_push($this->error, $error);
+					$result = $this->trigger_error($padding_plus, '@type', $json->{'@type'}.' is not a valid target for this field');
 				}
 				else{
-					$result = '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"></td><td class="field_name" style="padding-left:'.$padding_plus.'"> @type </td><td class="field_value">'.$json->{'@type'}.'</td></tr>';
+					$result = $this->print_message($padding_plus, '@type', 'valid', $json->{'@type'});
 				}
 
-				/* Now we validate the subJSON before */
+				/* Now we validate the subJSON */
 				$result .= $this->validate_json($this->values);
+
 				/* There is something in the error attribute*/
-				if (count($this->error)>0) {
-					$this->message_output = '
-					<tr class="table_line">
-						<td class="fa first_col fa-times-circle" aria-hidden="true"></td>
-						<td class="field_name error_field" style="padding-left:'.$padding.'">'.$this->field_name.'</td> 
-						<td class="field_value error_field">'.json_encode($this->error[0]['error']).'</td>
-					</tr>'.$result;
+				if (count($this->error)>0)
+				{
+					$output = $this->trigger_error($padding, $field_name, json_encode($this->error[0]['error']));
+					$this->message_output = $output.' '.$result;
 				}
+
 				/* There is something in the warning attribute */
 				elseif (count($this->warning)>0) {
-					$this->message_output = '
-					<tr class="table_line">
-						<td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td>
-						<td class="field_name field_warning" style="padding-left:'.$padding.'">'.$this->field_name.'</td> 
-						<td class="field_value field_warning">'.json_encode($this->warning[0]['warning']).'</td>
-					</tr>'.$result;
+					$output = $this->trigger_error($padding, $field_name, json_encode($this->warning[0]['warning']));
+					$this->message_output = $output.' '.$result;
 				}
+
 				/* There's no error and no warning */
 				else {
 					$this->message_output = '<tr class="table_line"><td class="fa first_col fa-check-circle"></td><td class="field_name" style="padding-left:'.$padding.'">'.$this->field_name.'</td> <td class="object_errors"></td> </tr>'.$result;
@@ -65,7 +59,7 @@ class BSCsubProcessor extends BSCProcessor{
 			/* Couldn't load the template : the field isn't supported by Bioschemas */
 			else{
 				$result = $this->validate_json($this->values);
-				$this->message_output = '<tr class="table_line"><td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td> <td class="field_value field_warning">This field is not supported by Bioschemas</td> </tr>'.$result;
+				$this->message_output = $this->trigger_error($padding, $field_name, 'This field is not supported by Bioschemas').' '.$result;
 			}
 		}
 	}	
