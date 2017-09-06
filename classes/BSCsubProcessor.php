@@ -5,12 +5,16 @@ class BSCsubProcessor extends BSCProcessor{
 	var $sublevel;
 	var $field_name;
 
-	function __construct($json, $field_name, $level, $type_expected, $field_description) {
+	function __construct($json, $field_name, $level, $type_expected, $field_description)
+	{
 		$field_name = str_replace('https://schema.org/', '', str_replace('http://schema.org/', '', str_replace('_', '@', $field_name))) ; 
-		if (!isset($json)){
+		if (!isset($json))
+		{
 			$this->errors=TRUE;
 		}
-		else {
+
+		else 
+		{
 			$this->values = $json;
 			$this->field_name = $field_name;
 			$this->sublevel = $level;
@@ -24,13 +28,17 @@ class BSCsubProcessor extends BSCProcessor{
 			$this->template_fields = $this->make_spec($spec_path);
 
 			// Subobject template can be loaded
-			if ($this->template_fields!=null){
+			if ($this->template_fields!=null)
+			{
 
 				/* Let's first check if the provided @type value is the expected type for this field */
-				if (!in_array(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})), $type_expected) and isset($type_expected)){
+				if (!in_array(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})), $type_expected) and isset($type_expected))
+				{
 					$result = $this->trigger_error($padding_plus, '@type', $json->{'@type'}.' is not a valid target for this field');
 				}
-				else{
+
+				else
+				{
 					$result = $this->print_message($padding_plus, '@type', 'valid', $json->{'@type'});
 				}
 
@@ -45,19 +53,22 @@ class BSCsubProcessor extends BSCProcessor{
 				}
 
 				/* There is something in the warning attribute */
-				elseif (count($this->warning)>0) {
+				elseif (count($this->warning)>0) 
+				{
 					$output = $this->trigger_error($padding, $field_name, json_encode($this->warning[0]['warning']));
 					$this->message_output = $output.' '.$result;
 				}
 
 				/* There's no error and no warning */
-				else {
-					$this->message_output = '<tr class="table_line"><td class="fa first_col fa-check-circle"></td><td class="field_name" style="padding-left:'.$padding.'">'.$this->field_name.'</td> <td class="object_errors"></td> </tr>'.$result;
+				else 
+				{
+					$this->message_output = $this->print_message($padding, $this->field_name, '').' '.$result;
 				}
 			}
 
 			/* Couldn't load the template : the field isn't supported by Bioschemas */
-			else{
+			else
+			{
 				$result = $this->validate_json($this->values);
 				$this->message_output = $this->trigger_error($padding, $field_name, 'This field is not supported by Bioschemas').' '.$result;
 			}
