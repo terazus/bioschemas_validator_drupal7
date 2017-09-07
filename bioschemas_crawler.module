@@ -8,7 +8,9 @@
 */
 
 
-// TODO: as some point enable microdata parsing?
+// TODO: resolves errors false positive with mutliples values not allowed
+// Microdata, Multiples times the same object is not correctly processed throught prepare_microdata();
+// Citation is null if there is a warning
 
 require_once 'easyrdf/lib/EasyRdf.php';
 require_once 'easyrdf/vendor/autoload.php';
@@ -69,13 +71,6 @@ function bioschemas_crawler_form($form, &$form_state){
 			'#value' => t("Submit query"),
 			'#suffix' =>  '</div>',
 	);
-
-	$form['custom_input'] = array(
-			'#title' => t("Enter your json code here"),
-			'#type' => 'textarea',
-			'#required' => FALSE,
-	);
-
 
 	if ($form_state['submitted']==TRUE){
 		$form['result'] = array(
@@ -202,7 +197,7 @@ function display_result(&$form_state){
 
 
 	$allowed_main_object = array('softwareapplication', 'event');
-	$message = '<div> <HR>';
+	$message = '<div class="output_container">';
 
 	
 	if($form_state['input']['custom_input']== NULL){
@@ -251,16 +246,13 @@ function display_result(&$form_state){
 			$script = $xpath->query( '//script[@type="application/ld+json"]' );
 			foreach ($script as $item) {		
 				$json = $item->nodeValue;
-				//foreach (json_decode($json) as $item){
-					//dpm($item);
-					// Use to loop to get all the items in the json before testing the presence or absence of the @graph attribute.
-				//}
 				if (isset(json_decode($json)->{'@graph'})){
 					foreach (json_decode($json)->{'@graph'} as $newtool){
 						$tool = new BSCProcessor($newtool);
 						$insert_message = $tool->make_table();
 						$message .= "<div class='bs_output'>".$insert_message."</div>";
-						//$message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode(json_decode($json)->{'@graph'}, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+						$message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode(json_decode($json)->{'@graph'}, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+						dpm($tool->error);
 					}
 
 				}				
@@ -271,28 +263,11 @@ function display_result(&$form_state){
 					$insert_message = $tool->make_table();
 					$message .= "<div class='bs_output'>".$insert_message."</div>";
 					$message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode(json_decode($json), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+					dpm($tool->error);
 				}
 			}
 		}
 	}
-
-	else{
-		$test = $form_state['input']['custom_input'];
-		$json_input = json_decode(preg_replace("/[\r\n\t]+/", '', $test));
-
-		if ($json_input == false){
-			$message.= '<div>There is a probleme with your json</div>';
-		}
-		else{
-			$new_ide = new IDEInterpreter($json_input);
-			$message .= $new_ide->message;
-			$BSCobject = new BSCProcessor($json_input);
-			$insert_message = $BSCobject->make_table();
-			$message .= "<div class='bs_output'>".$insert_message."</div>";
-			$message .= '<div class="json_display"><h4> Json code:</h4><pre>'.json_encode($BSCobject->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
-		}
-	}
-
 	return $message."</div>";
 }
 
@@ -305,7 +280,57 @@ function bioschemas_crawler_form_submit($form, &$form_state){
 
 function make_header(){
 	global $base_url;
-	return "";
+
+
+	$text = '
+		<script type="application/ld+json">
+		{
+			"@context": "http://schema.org",
+			"@type": "SoftwareApplication",
+			"name": "Bioschemas validator",
+			"featureList":"http://edamontology.org/operation_0004",
+			"description": "This tool is désigned to validate the fields of a schema.org object based on Bioschemas specifications. It process a URL link to a page enhanced with schema.org markup and is able to read all three formats (Microdata, JSON-LD and RDFa).",
+			"url": "https://www.france-bioinformatique.fr/en/bioschemas_crawler",
+			"applicationCategory": ["Web Application"],
+			"license":{
+				"@type": "CreativeWork",
+				"name": "LGPL-V3",
+				"url": "https://github.com/terazus/bioschemas_validator_drupal7/blob/master/LICENCE",
+				"description": "generic software licence"
+			},
+			"potentialAction": {
+				"@type": "ControlAction",
+				"object": {
+					"@type": "Dataset",
+					"additionalType": "http://edamontology.org/format_3749"
+				},
+				"result": {
+					"@type": "Dataset",
+					"additionalType": "http://edamontology.org/format_2331"
+				}
+			},
+			"Citation": {
+			    "@type":"CreativeWork",
+			  	"name": "RSAT: regulatory sequence analysis tools.",
+			    "url": "https://www.example.com/myarticle",
+				"description": "This is a description"
+			},
+			"keywords":["http://edamontology.org/topic_3345"],
+			"softwareVersion": "1.0",
+			"publisher": {
+			   "@type": "Organization",
+			   "name": "IFB",
+			   "email": "contact@groupes.france-bioinformatique.fr",
+			   "description": "French Institut of Bioinformatics (French Elixir Node)"
+			},
+			"dateCreated":"07/06/2017"
+		}
+		</script>
+	';
+
+
+
+	return $text;
 	/*"
 	<div class='header' style='border:1px solid #ccc; padding:10px;'>
 		<p> To start using the crawler you can either: </p>

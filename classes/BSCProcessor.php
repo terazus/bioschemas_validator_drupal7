@@ -25,7 +25,7 @@ class BSCProcessor extends stdClass{
 
 	protected $template_fields;
 	public $message_output = '';
-	protected $values;
+	public $values;
 	public $error = array();
 	public $warning = array();
 	protected $sublevel = 1;
@@ -55,7 +55,7 @@ class BSCProcessor extends stdClass{
 
 			if ($this->template_fields!=null){
 				$result = $this->validate_json($this->values);
-				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th class="object_errors">'.count($this->error).' error(s) & '.
+				$this->message_output = '<tr class="first_line"><th class="first_col"></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th class="object_errors">'.count($this->error).' error(s) & '.
 				count($this->warning).' warning(s) </th> </tr>'.$result;
 				if (!isset($json->{"@type"})){
 					$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'_type'}.'</th> <th class="object_errors">'.count($this->error).' error(s) & '.

@@ -62,7 +62,7 @@ class BSCsubProcessor extends BSCProcessor{
 				/* There's no error and no warning */
 				else 
 				{
-					$this->message_output = $this->print_message($padding, $this->field_name, '').' '.$result;
+					$this->message_output = $this->print_message($padding, $this->field_name, 'valid', '').' '.$result;
 				}
 			}
 
