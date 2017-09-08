@@ -34,10 +34,10 @@ class BSCProcessor extends stdClass{
 	/**
 	 * Constructor
 	 *
-	 * You should first make sure your JSON-lf variable is valid (use json_decode).
+	 * You should first make sure your JSON-ld variable is valid (json_decode()).
 	 *
 	 * @param 	object 	$json 			A json-ld variable containing the fields to process
-	 * @return 	object 	BSCProcessor
+	 * @return 	object 	BSCProcessor 	An object that processes the fields and containing an HTML table, an array of errors and an array of warnings.
 	 */
 	public function __construct($json) {
 		if (!isset($json)){
@@ -63,11 +63,7 @@ class BSCProcessor extends stdClass{
 				}
 			}
 			else{
-				$result = $this->validate_json($this->values);
-				$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'@type'}.' (UNSUPPORTED OBJECT) </th> <th></th> </tr>'.$result;
-				if (!isset($json->{"@type"})){
-					$this->message_output = '<tr class="first_line"><th></th><th class="field_name">'.$this->values->{'_type'}.' (UNSUPPORTED OBJECT) </th> <th></th> </tr>'.$result;
-				}
+				array_push($this->error, 'UNSUPPORTED');
 			}
 		}
 	}

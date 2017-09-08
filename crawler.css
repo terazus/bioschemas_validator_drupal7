@@ -97,17 +97,28 @@ form#bioschemas-crawler-form div.form_item{
 
 @media(min-width: 1201px){
 	div.bs_output{
-		width:60%;
+		width:49%;
+		margin-right: 2%;
 	}
 	div.json_display {
-		width:40%;
+		width:49%;
 	}
 }
 
+div.BS_item{
+	padding:0 20px 20px 20px;
+}
+
 div.bs_output{
-	float:left;
+	display:inline-block;
 	vertical-align: top;
 	font-size:14px;
+}
+
+div.bs_output, div.json_display{
+	position:relative;
+	top:-45px;
+	margin-bottom: 20px;
 }
 
 body.page-bioschemas-crawler div.json_display pre{
@@ -118,23 +129,37 @@ body.page-bioschemas-crawler div.json_display pre{
 }
 
 body.page-bioschemas-crawler div.json_display{
-	float:right;
+	display:inline-block;
 	vertical-align: top;
 	border:1px solid #ccc;
-	border-top:0px;
-	border-left:0px;
-	padding:20px;
+	padding:0px 20px 20px 20px;
+	box-shadow: 4px 4px 4px #D6D6D6;
 }
 
 
 body.page-bioschemas-crawler div.output_container{
-	position: relative;
-	/*top:-17px;*/
+	position:relative;
+	top:62px;
+	border:1px solid #ccc;
+	border-top:0px;
+	margin-bottom: 60px;
 }
 
 table.bioschemas_validation{
 	width:100%;
 	border-collapse: collapse;
+}
+
+div.bs_output table tbody{
+	box-shadow: 4px 4px 4px #D6D6D6;
+}
+
+div.bs_output tr *{
+	text-align: justify;
+}
+
+div.bs_output td.field_value{
+	padding-right:10px;
 }
 
 div.bs_output tr.table_line{
@@ -151,7 +176,6 @@ div.bs_output tr.table_line:hover{
 
 div.bs_output tr.first_line{
 	border:1px solid #ccc;
-	border-top:0px;
 	padding:5px 15px 5px 15px;
 	height:40px;
 	border-left:0px;

@@ -201,6 +201,8 @@ function display_result(&$form_state){
 
 	
 	if($form_state['input']['custom_input']== NULL){
+		
+		// Process RDFa 
 		if($form_state['input']['target_format']=='rdfa'){
 			$json_input = new EasyRdf_Graph($form_state['input']['target_url']);
 			$json_input->load();
@@ -221,19 +223,26 @@ function display_result(&$form_state){
 				
 			}
 		}
+
+		// Process Microdata
 		elseif($form_state['input']['target_format']=='microdata'){
 			$raw_json = new MicrodataParser($form_state['input']['target_url']);
 			$json = json_decode($raw_json->getJson());
 			$json = prepare_Microdata($json);
+			$item_counter == 0;
 
 			foreach ($json as $object){
 				$validated_object = new BSCProcessor($object);
-				$insert_message = $validated_object->make_table();
-				$message .= "<div class='bs_output'>".$insert_message."</div>";
-				$message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode($object, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
+				if (!in_array('UNSUPPORTED', $validated_object->error))
+				{
+					$item_counter++;
+					$insert_message = $validated_object->make_table();
+					$message .= output_message($insert_message, $item_counter, json_encode($object, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+				}
 			}
 		}
 
+		// Process JSON-LD
 		elseif ($form_state['input']['target_format']=='jsonld'){
 			$context = stream_context_create(array('http' => array('ignore_errors' => true)));
 			$html = file_get_contents($form_state['input']['target_url'], false, $context);
@@ -244,26 +253,32 @@ function display_result(&$form_state){
 
 			$script = $dom->getElementsByTagName( 'script' );
 			$script = $xpath->query( '//script[@type="application/ld+json"]' );
-			foreach ($script as $item) {		
+
+
+			$item_counter = 0;
+			foreach ($script as $item)
+			{
+				$item_counter++;		
 				$json = $item->nodeValue;
-				if (isset(json_decode($json)->{'@graph'})){
-					foreach (json_decode($json)->{'@graph'} as $newtool){
+
+				if (isset(json_decode($json)->{'@graph'}))
+				{
+					foreach (json_decode($json)->{'@graph'} as $newtool)
+					{
 						$tool = new BSCProcessor($newtool);
 						$insert_message = $tool->make_table();
 						$message .= "<div class='bs_output'>".$insert_message."</div>";
 						$message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode(json_decode($json)->{'@graph'}, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
 						dpm($tool->error);
 					}
-
 				}				
 
-				else{
+				else
+				{
 					$json = preg_replace("/[\r\n\t]+/", '', $json);
 					$tool = new BSCProcessor(json_decode($json));
 					$insert_message = $tool->make_table();
-					$message .= "<div class='bs_output'>".$insert_message."</div>";
-					$message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode(json_decode($json), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
-					dpm($tool->error);
+					$message .= output_message($insert_message, $item_counter, $json);
 				}
 			}
 		}
@@ -275,6 +290,18 @@ function display_result(&$form_state){
 function bioschemas_crawler_form_submit($form, &$form_state){
 	$form_state['submitted'] = TRUE;
 	$form_state['rebuild'] = TRUE;
+}
+
+function output_message($insert_message, $item_counter, $input_json)
+{
+	$json = json_encode(json_decode($input_json), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+	$message = "
+		<div class='BS_item' id='item_".$item_counter."'> 
+			<div class='bs_output'>".$insert_message."</div>
+			<div class='json_display'> <h4> Corresponding JSON-LD code </h4> <pre>".$json."</pre> </div>
+	";			
+	$message .= "</div>";
+	return $message;
 }
 
 
@@ -289,7 +316,7 @@ function make_header(){
 			"@type": "SoftwareApplication",
 			"name": "Bioschemas validator",
 			"featureList":"http://edamontology.org/operation_0004",
-			"description": "This tool is désigned to validate the fields of a schema.org object based on Bioschemas specifications. It process a URL link to a page enhanced with schema.org markup and is able to read all three formats (Microdata, JSON-LD and RDFa).",
+			"description": "This tool is designed to validate the fields of a schema.org object based on Bioschemas specifications. It process a URL link to a page enhanced with schema.org markup and is able to read all three formats (Microdata, JSON-LD and RDFa).",
 			"url": "https://www.france-bioinformatique.fr/en/bioschemas_crawler",
 			"applicationCategory": ["Web Application"],
 			"license":{
@@ -317,33 +344,25 @@ function make_header(){
 			},
 			"keywords":["http://edamontology.org/topic_3345"],
 			"softwareVersion": "1.0",
-			"publisher": {
+			"publisher": [
+			{
 			   "@type": "Organization",
 			   "name": "IFB",
 			   "email": "contact@groupes.france-bioinformatique.fr",
 			   "description": "French Institut of Bioinformatics (French Elixir Node)"
 			},
+			{
+				"@type": "Person",
+				"name": "Batista Dominique",
+				"email": "dominique.batista@france-bioinformatique.fr",
+				"description": "Web developer @ IFB-Core"
+			}
+			],
 			"dateCreated":"07/06/2017"
 		}
 		</script>
 	';
-
-
-
 	return $text;
-	/*"
-	<div class='header' style='border:1px solid #ccc; padding:10px;'>
-		<p> To start using the crawler you can either: </p>
-		<ul style='padding:0px 5px 0px 20px;'>
-			<li> Fill the form below by providing the target URL and the input format </li>
-			<li> Provide the target url and input format using the API: <BR>
-				<div style='text-align:center;'> ".$base_url."/bioschemas_crawler?url=myURL&format=inputFormat </div> 
-				<i style='font-size:12px;'>(e.g.".$base_url."/bioschemas_crawler?url=https://www.france-bioinformatique.fr/en/evenements_upcoming&format=rdfa) </i>
-			</li>
-		</ul>
-	</div>
-	<div style='border:1px solid red;padding:10px;margin-top:15px;'> 
-	";*/
 }
 
 
