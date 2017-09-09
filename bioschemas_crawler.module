@@ -30,8 +30,31 @@ function bioschemas_crawler_menu(){
 }
 
 function bioschemas_crawler_page($form, &$form_state){
-	$form = drupal_get_form('bioschemas_crawler_form');
-	return $form;	
+
+
+	$api_media = $_GET['media'];
+	$api_url = $_GET['url'];
+	$api_format = $_GET['format'];
+
+	if ($api_media == 'json')
+	{
+		if (isset($api_format) and isset($api_url)){
+			if ($api_format=='microdata'){
+				$raw_json = new MicrodataParser($api_url);
+				$json = json_decode($raw_json->getJson());
+				$prepared_json = new PreProcessor($json, 'microdata');			
+				$json = $prepared_json->output_json;
+				output_JSONs_from_Microdata($json);
+				exit;
+			}
+		}
+	}
+
+	else
+	{
+		$form = drupal_get_form('bioschemas_crawler_form');
+		return $form;
+	}	
 }
 
 function bioschemas_crawler_form($form, &$form_state){
@@ -105,7 +128,6 @@ function display_result(&$form_state)
 
 			$prepared_json = new PreProcessor($myjson->{'@graph'}, 'rdfa');
 			$myjson = $prepared_json->output_json;
-			//$myjson = prepare_RDFA($myjson->{'@graph'});
 
 			foreach($myjson as $sub_json){
 				$new_json = prepare_subRDFA($myjson, $sub_json);
@@ -124,7 +146,6 @@ function display_result(&$form_state)
 		elseif($form_state['input']['target_format']=='microdata'){
 			$raw_json = new MicrodataParser($form_state['input']['target_url']);
 			$json = json_decode($raw_json->getJson());
-			//$json = prepare_Microdata($json);
 			$prepared_json = new PreProcessor($json, 'microdata');			
 			$json = $prepared_json->output_json;
 			$item_counter == 0;
@@ -139,11 +160,6 @@ function display_result(&$form_state)
 						$message .= output_message($insert_message, $item_counter, json_encode($object, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 					}
 				}
-			}
-
-			elseif ($api_media == 'json'){
-				output_JSONs_from_Microdata($json);
-				//exit;
 			}
 		}
 

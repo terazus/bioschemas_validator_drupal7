@@ -132,11 +132,21 @@ class PreProcessor extends StdClass{
 
 			foreach ($object as $field_name=>$field_value){
 				if ($field_name != '_class'){
-					if(gettype($field_value)!='object'){
-						$object_as_json->{str_replace('_', '@', $field_name)} = str_replace('http://schema.org/', '', str_replace('"', "'", $field_value));
+					if(gettype($field_value)=='string'){
+						$object_as_json->{str_replace('_', '@', $field_name)} = str_replace('http://schema.org/', '', str_replace('&quot;', "'", $field_value));
+					}
+					elseif(gettype($field_value)=='array'){
+						$temp_values = array();
+						foreach($field_value as $value){
+							array_push($temp_values, str_replace('"', "'", $value));
+						}
+						$object_as_json->{str_replace('_', '@', $field_name)} = $temp_values;
 					}
 
-					else{
+					elseif(gettype($field_value)=='object'){
+
+						$this->prepare_subMicrodata($field_value);
+
 						$subobject_as_json = new stdClass;
 						foreach ($field_value as $subfield_name=>$subfield_value){
 							if ($subfield_name != '_class'){
@@ -151,6 +161,38 @@ class PreProcessor extends StdClass{
 			array_push($processed_json, $object_as_json);
 		}
 		return $processed_json;
+	}
+
+	private function prepare_subMicrodata($json)
+	{
+		$object_as_json = new stdClass;
+	
+		foreach ($json as $field_name=>$field_value)
+		{
+			if ($field_name != '_class')
+			{
+				if(gettype($field_value)=='string'){
+					$object_as_json->{str_replace('_', '@', $field_name)} = str_replace('http://schema.org/', '', str_replace('&quot;', "'", $field_value));
+				}
+			}
+
+			elseif(gettype($field_value)=='array')
+			{
+				$temp_values = array();
+				foreach($field_value as $value)
+				{
+					array_push($temp_values, str_replace('"', "'", $value));
+				}
+				$object_as_json->{str_replace('_', '@', $field_name)} = $temp_values;
+			}
+
+			elseif(gettype($field_value)=='object'){
+				$object_as_json->{str_replace('_', '@', $field_name)} = $this->prepare_Microdata($field_value);
+			}
+
+		}
+
+		return $object_as_json;
 	}
 
 }
