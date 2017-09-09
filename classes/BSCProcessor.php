@@ -231,7 +231,7 @@ class BSCProcessor extends stdClass{
 
 	protected function process_string_field($field_name, $field_value)
 	{
-		$field_name = str_replace('_', '@', $field_name);
+		$$field_name = str_replace('_', '@', $field_name);
 		$output = '';
 
 		$padding = $this->sublevel*20;
