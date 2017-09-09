@@ -81,7 +81,7 @@ class PreProcessor extends StdClass{
 		return $new_json;	
 	}
 
-	private function prepare_subRDFA($myjson, $sub_json){
+	public function prepare_subRDFA($myjson, $sub_json){
 		$new_json = new stdClass;
 
 		foreach($sub_json as $sub_field=>$sub_value){

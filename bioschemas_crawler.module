@@ -29,7 +29,8 @@ function bioschemas_crawler_menu(){
 	return $items;
 }
 
-function bioschemas_crawler_page($form, &$form_state){
+function bioschemas_crawler_page($form, &$form_state)
+{
 
 
 	$api_media = $_GET['media'];
@@ -38,13 +39,50 @@ function bioschemas_crawler_page($form, &$form_state){
 
 	if ($api_media == 'json')
 	{
-		if (isset($api_format) and isset($api_url)){
-			if ($api_format=='microdata'){
+		if (isset($api_format) and isset($api_url))
+		{
+			if ($api_format=='microdata')
+			{
 				$raw_json = new MicrodataParser($api_url);
 				$json = json_decode($raw_json->getJson());
 				$prepared_json = new PreProcessor($json, 'microdata');			
 				$json = $prepared_json->output_json;
 				output_JSONs_from_Microdata($json);
+				exit;
+			}
+
+			if ($api_format=='rdfa'){
+				$json_input = new EasyRdf_Graph($api_url);
+				$json_input->load();
+				$options = array('compact'=>true);
+				$serialiser = new EasyRdf_Serialiser_JsonLd();
+				$myjson = json_decode($serialiser->serialise($json_input, 'jsonld', $options));
+				$prepared_json = new PreProcessor($myjson->{'@graph'}, 'rdfa');
+				$myjson = $prepared_json->output_json;
+
+				$allowed_main_object = array('softwareapplication', 'event');
+				$new_json = array();
+				foreach($myjson as $sub_json)
+				{
+					$new_subjson = $prepared_json->prepare_subRDFA($myjson, $sub_json);
+					if (in_array(strtolower(str_replace('https://schema.org/', '', str_replace('http://schema.org/', '', $new_subjson->{'@type'}))), $allowed_main_object))
+					{
+						$new_subjson->{'@context'} = 'http://schema.org';
+						array_push($new_json, $new_subjson);
+					}
+				}
+
+				$item_counter = 0;
+				$item_limit = count($new_json);
+				echo '[';
+				foreach ($new_json as $sub_json){
+					$item_counter++;
+					echo json_encode($sub_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+					if ($item_counter!=$item_limit){
+						echo',';
+					}
+				}
+				echo ']';
 				exit;
 			}
 		}
@@ -130,7 +168,7 @@ function display_result(&$form_state)
 			$myjson = $prepared_json->output_json;
 
 			foreach($myjson as $sub_json){
-				$new_json = prepare_subRDFA($myjson, $sub_json);
+				$new_json = $prepared_json->prepare_subRDFA($myjson, $sub_json);
 				if (in_array(strtolower(str_replace('https://schema.org/', '', str_replace('http://schema.org/', '', $new_json->{'@type'}))), $allowed_main_object)){			
 					$tool = new BSCProcessor($new_json);
 					$insert_message = $tool->make_table();
@@ -212,6 +250,7 @@ function output_JSONs_from_Microdata($json)
 {
 	$valid_objects_array = array();
 	echo '[';
+
 	foreach ($json as $object)
 	{
 		$validated_object = new BSCProcessor($object);
@@ -315,10 +354,3 @@ function make_header(){
 }
 
 ?>
-
-
-
-
-
-
-
