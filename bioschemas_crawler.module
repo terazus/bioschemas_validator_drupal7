@@ -345,12 +345,23 @@ function display_result(&$form_state)
 					}
 				}				
 
-				else
+				elseif (gettype(json_decode($json))=='object')
 				{
 					$json = preg_replace("/[\r\n\t]+/", '', $json);
 					$tool = new BSCProcessor(json_decode($json));
 					$insert_message = $tool->make_table();
 					$message .= output_message($insert_message, $item_counter, $json);
+				}
+
+				elseif (gettype(json_decode($json))=='array')
+				{
+					$json = preg_replace("/[\r\n\t]+/", '', $json);
+					foreach (json_decode($json) as $newobject)
+					{
+						$tool = new BSCProcessor($newobject);
+						$insert_message = $tool->make_table();
+						$message .= output_message($insert_message, $item_counter, json_encode($newobject));
+					}
 				}
 			}
 		}
