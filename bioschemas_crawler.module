@@ -137,13 +137,8 @@ function bioschemas_crawler_page($form, &$form_state)
 				echo '[';
 
 				foreach ($script as $item)
-				{
-					
-					
-					$json = $item->nodeValue;
-
-					dpm(json_decode($json));
-					
+				{					
+					$json = $item->nodeValue;					
 					if (isset(json_decode($json)->{'@graph'}))
 					{
 						$item_counter = 0;
@@ -177,7 +172,6 @@ function bioschemas_crawler_page($form, &$form_state)
 
 					elseif (gettype(json_decode($json))=='array')
 					{
-						dpm('lol');
 						$item_counter = 0;
 						$item_limit = count(json_decode($json));
 						foreach (json_decode($json) as $newobject)
@@ -348,7 +342,6 @@ function display_result(&$form_state)
 						$insert_message = $tool->make_table();
 						$message .= "<div class='bs_output'>".$insert_message."</div>";
 						$message .= '<div class="json_display"><h4> Json code:</h4><pre contenteditable="true">'.json_encode(json_decode($json)->{'@graph'}, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).'</pre></div>';
-						dpm($tool->error);
 					}
 				}				
 
