@@ -50,7 +50,8 @@ function bioschemas_crawler_page($form, &$form_state)
 				$json = $prepared_json->output_json;
 
 				$valid_objects_array = array();
-				foreach ($json as $object){
+				foreach ($json as $object)
+				{
 					$validated_object = new BSCProcessor($object);
 					if (!in_array('UNSUPPORTED', $validated_object->error))
 					{
@@ -61,7 +62,8 @@ function bioschemas_crawler_page($form, &$form_state)
 				$last_item = count($valid_objects_array);
 				$current_item = 0;
 				echo '[';
-				foreach ($valid_objects_array as $object){
+				foreach ($valid_objects_array as $object)
+				{
 					$current_item++;
 					echo '{';
 					echo '"error": '.json_encode($object->error).',';
@@ -74,13 +76,11 @@ function bioschemas_crawler_page($form, &$form_state)
 					}
 				}
 				echo ']';
-
-
-				//output_JSONs_from_Microdata($json);
 				exit;
 			}
 
-			if ($api_format=='rdfa'){
+			elseif ($api_format=='rdfa')
+			{
 				$json_input = new EasyRdf_Graph($api_url);
 				$json_input->load();
 				$options = array('compact'=>true);
@@ -104,7 +104,8 @@ function bioschemas_crawler_page($form, &$form_state)
 				$item_counter = 0;
 				$item_limit = count($new_json);
 				echo '[';
-				foreach ($new_json as $sub_json){
+				foreach ($new_json as $sub_json)
+				{
 					$item_counter++;
 					$tool = new BSCProcessor($sub_json);
 					echo '{';
@@ -112,12 +113,91 @@ function bioschemas_crawler_page($form, &$form_state)
 					echo '"warning": '.json_encode($tool->warning).',';
 					echo '"json": '.json_encode($sub_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 					echo '}';
-					if ($item_counter!=$item_limit){
+					if ($item_counter!=$item_limit)
+					{
 						echo',';
 					}
 				}
 				echo ']';
 				exit;
+			}
+
+			elseif ($api_format=='json')
+			{
+				$context = stream_context_create(array('http' => array('ignore_errors' => true)));
+				$html = file_get_contents($api_url, false, $context);
+				$dom = new DOMDocument();
+				libxml_use_internal_errors( 1 );
+				$dom->loadHTML( $html );
+				$xpath = new DOMXpath( $dom );
+
+				$script = $dom->getElementsByTagName( 'script' );
+				$script = $xpath->query( '//script[@type="application/ld+json"]' );
+
+				echo '[';
+
+				foreach ($script as $item)
+				{
+					
+					
+					$json = $item->nodeValue;
+
+					dpm(json_decode($json));
+					
+					if (isset(json_decode($json)->{'@graph'}))
+					{
+						$item_counter = 0;
+						$item_limit = count(json_decode($json)->{'@graph'});
+						foreach (json_decode($json)->{'@graph'} as $newtool)
+						{
+							$item_counter ++;
+							echo '{';
+							$tool = new BSCProcessor($newtool);
+							echo '"error": '.json_encode($tool->error).',';
+							echo '"warning": '.json_encode($tool->warning).',';
+							echo '"json": '.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+							echo '}';
+							if ($item_counter!=$item_limit)
+							{
+								echo',';
+							}
+						}
+					}				
+
+					elseif (gettype(json_decode($json))=='object')
+					{
+						echo '{';
+						$json = preg_replace("/[\r\n\t]+/", '', $json);
+						$tool = new BSCProcessor(json_decode($json));
+						echo '"error": '.json_encode($tool->error).',';
+						echo '"warning": '.json_encode($tool->warning).',';
+						echo '"json": '.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+						echo '}';
+					}
+
+					elseif (gettype(json_decode($json))=='array')
+					{
+						dpm('lol');
+						$item_counter = 0;
+						$item_limit = count(json_decode($json));
+						foreach (json_decode($json) as $newobject)
+						{
+							$item_counter ++;
+							echo '{';
+							$tool = new BSCProcessor($newobject);
+							echo '"error": '.json_encode($tool->error).',';
+							echo '"warning": '.json_encode($tool->warning).',';
+							echo '"json": '.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+							echo '}';
+							if ($item_counter!=$item_limit)
+							{
+								echo',';
+							}
+						}
+					}
+
+				}
+				echo ']';
 			}
 		}
 	}
@@ -189,10 +269,12 @@ function display_result(&$form_state)
 
 	$api_media = $_GET['media'];
 	
-	if($form_state['input']['custom_input']== NULL){
+	if($form_state['input']['custom_input']== NULL)
+	{
 		
 		// Process RDFa 
-		if($form_state['input']['target_format']=='rdfa'){
+		if($form_state['input']['target_format']=='rdfa')
+		{
 			$json_input = new EasyRdf_Graph($form_state['input']['target_url']);
 			$json_input->load();
 			$options = array('compact'=>true);
@@ -202,7 +284,8 @@ function display_result(&$form_state)
 			$prepared_json = new PreProcessor($myjson->{'@graph'}, 'rdfa');
 			$myjson = $prepared_json->output_json;
 
-			foreach($myjson as $sub_json){
+			foreach($myjson as $sub_json)
+			{
 				$new_json = $prepared_json->prepare_subRDFA($myjson, $sub_json);
 				if (in_array(strtolower(str_replace('https://schema.org/', '', str_replace('http://schema.org/', '', $new_json->{'@type'}))), $allowed_main_object)){			
 					$tool = new BSCProcessor($new_json);
@@ -216,14 +299,16 @@ function display_result(&$form_state)
 		}
 
 		// Process Microdata
-		elseif($form_state['input']['target_format']=='microdata'){
+		elseif($form_state['input']['target_format']=='microdata')
+		{
 			$raw_json = new MicrodataParser($form_state['input']['target_url']);
 			$json = json_decode($raw_json->getJson());
 			$prepared_json = new PreProcessor($json, 'microdata');			
 			$json = $prepared_json->output_json;
 			$item_counter == 0;
 
-			if ($api_media == null){
+			if ($api_media == null)
+			{
 				foreach ($json as $object){
 					$validated_object = new BSCProcessor($object);
 					if (!in_array('UNSUPPORTED', $validated_object->error))
@@ -335,56 +420,63 @@ function make_header()
 
 	$text = '
 		<script type="application/ld+json">
-		{
-			"@context": "http://schema.org",
-			"@type": "SoftwareApplication",
-			"name": "Bioschemas validator",
-			"featureList":"http://edamontology.org/operation_0004",
-			"description": "This tool is designed to validate the fields of a schema.org object based on Bioschemas specifications. It process a URL link to a page enhanced with schema.org markup and is able to read all three formats (Microdata, JSON-LD and RDFa).",
-			"url": "https://www.france-bioinformatique.fr/en/bioschemas_crawler",
-			"applicationCategory": ["Web Application"],
-			"license":{
-				"@type": "CreativeWork",
-				"name": "LGPL-V3",
-				"url": "https://github.com/terazus/bioschemas_validator_drupal7/blob/master/LICENCE",
-				"description": "generic software licence"
-			},
-			"potentialAction": {
-				"@type": "ControlAction",
-				"object": {
-					"@type": "Dataset",
-					"additionalType": "http://edamontology.org/format_3749"
+		[
+			{
+				"@context": "http://schema.org",
+				"@type": "SoftwareApplication",
+				"name": "Bioschemas validator",
+				"featureList":"http://edamontology.org/operation_0004",
+				"description": "This tool is designed to validate the fields of a schema.org object based on Bioschemas specifications. It process a URL link to a page enhanced with schema.org markup and is able to read all three formats (Microdata, JSON-LD and RDFa).",
+				"url": "https://www.france-bioinformatique.fr/en/bioschemas_crawler",
+				"applicationCategory": ["Web Application"],
+				"license":{
+					"@type": "CreativeWork",
+					"name": "LGPL-V3",
+					"url": "https://github.com/terazus/bioschemas_validator_drupal7/blob/master/LICENCE",
+					"description": "generic software licence"
 				},
-				"result": {
-					"@type": "Dataset",
-					"additionalType": "http://edamontology.org/format_2331"
+				"potentialAction": {
+					"@type": "ControlAction",
+					"object": {
+						"@type": "Dataset",
+						"additionalType": "http://edamontology.org/format_3749"
+					},
+					"result": {
+						"@type": "Dataset",
+						"additionalType": "http://edamontology.org/format_2331"
+					}
+				},
+				"Citation": {
+				    "@type":"CreativeWork",
+				  	"name": "RSAT: regulatory sequence analysis tools.",
+				    "url": "https://www.example.com/myarticle",
+					"description": "This is a description"
+				},
+				"keywords":["http://edamontology.org/topic_3345"],
+				"softwareVersion": "1.0",
+				"publisher": [
+				{
+				   "@type": "Organization",
+				   "name": "IFB",
+				   "email": "contact@groupes.france-bioinformatique.fr",
+				   "description": "French Institut of Bioinformatics (French Elixir Node)"
+				},
+				{
+					"@type": "Person",
+					"name": "Batista Dominique",
+					"email": "dominique.batista@france-bioinformatique.fr",
+					"description": "Web developer @ IFB-Core"
 				}
-			},
-			"Citation": {
-			    "@type":"CreativeWork",
-			  	"name": "RSAT: regulatory sequence analysis tools.",
-			    "url": "https://www.example.com/myarticle",
-				"description": "This is a description"
-			},
-			"keywords":["http://edamontology.org/topic_3345"],
-			"softwareVersion": "1.0",
-			"publisher": [
-			{
-			   "@type": "Organization",
-			   "name": "IFB",
-			   "email": "contact@groupes.france-bioinformatique.fr",
-			   "description": "French Institut of Bioinformatics (French Elixir Node)"
+				],
+				"dateCreated":"07/06/2017",
+				"dateModified":"09/09/2017"
 			},
 			{
-				"@type": "Person",
-				"name": "Batista Dominique",
-				"email": "dominique.batista@france-bioinformatique.fr",
-				"description": "Web developer @ IFB-Core"
+				"@context": "http://schema.org",
+				"@type": "SoftwareApplication",
+				"name": "Blablabla"
 			}
-			],
-			"dateCreated":"07/06/2017",
-			"dateModified":"09/09/2017"
-		}
+		]
 		</script>
 	';
 	return $text;
