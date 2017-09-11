@@ -18,7 +18,8 @@ require_once 'classes/BSCProcessor.php';
 require_once 'classes/PreProcessor.php';
 require_once 'PHP-Microdata/MicrodataParser.php';
 
-function bioschemas_crawler_menu(){
+function bioschemas_crawler_menu()
+{
 	$items['bioschemas_crawler'] = array( 
 			'title' => t('Bioschemas structured data testing tool'), 
 			'page callback' => 'bioschemas_crawler_page', 
@@ -77,7 +78,12 @@ function bioschemas_crawler_page($form, &$form_state)
 				echo '[';
 				foreach ($new_json as $sub_json){
 					$item_counter++;
-					echo json_encode($sub_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+					$tool = new BSCProcessor($sub_json);
+					echo '{';
+					echo '"error": '.json_encode($tool->error).',';
+					echo '"warning": '.json_encode($tool->warning).',';
+					echo '"json": '.json_encode($sub_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+					echo '}';
 					if ($item_counter!=$item_limit){
 						echo',';
 					}
@@ -95,7 +101,8 @@ function bioschemas_crawler_page($form, &$form_state)
 	}	
 }
 
-function bioschemas_crawler_form($form, &$form_state){
+function bioschemas_crawler_form($form, &$form_state)
+{
 
 	
 	$header_text = make_header();
@@ -274,7 +281,8 @@ function output_JSONs_from_Microdata($json)
 }
 
 
-function bioschemas_crawler_form_submit($form, &$form_state){
+function bioschemas_crawler_form_submit($form, &$form_state)
+{
 	$form_state['submitted'] = TRUE;
 	$form_state['rebuild'] = TRUE;
 }
@@ -292,7 +300,8 @@ function output_message($insert_message, $item_counter, $input_json)
 }
 
 
-function make_header(){
+function make_header()
+{
 	global $base_url;
 
 
