@@ -48,7 +48,35 @@ function bioschemas_crawler_page($form, &$form_state)
 				$json = json_decode($raw_json->getJson());
 				$prepared_json = new PreProcessor($json, 'microdata');			
 				$json = $prepared_json->output_json;
-				output_JSONs_from_Microdata($json);
+
+				$valid_objects_array = array();
+				foreach ($json as $object){
+					$validated_object = new BSCProcessor($object);
+					if (!in_array('UNSUPPORTED', $validated_object->error))
+					{
+						array_push($valid_objects_array, $validated_object);			
+					}
+				}
+
+				$last_item = count($valid_objects_array);
+				$current_item = 0;
+				echo '[';
+				foreach ($valid_objects_array as $object){
+					$current_item++;
+					echo '{';
+					echo '"error": '.json_encode($object->error).',';
+					echo '"warning": '.json_encode($object->warning).',';
+					echo '"json": '.json_encode($object->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+					echo '}';
+					if ($current_item!=$last_item)
+					{
+						echo ',';
+					}
+				}
+				echo ']';
+
+
+				//output_JSONs_from_Microdata($json);
 				exit;
 			}
 
