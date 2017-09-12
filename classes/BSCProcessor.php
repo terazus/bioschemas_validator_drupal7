@@ -216,16 +216,30 @@ class BSCProcessor extends stdClass{
 		$field_name = str_replace('http://schema.org/', '', $field_name);
 		$subobject = new BSCsubProcessor($field_value, $field_name, $level, $this->template_fields[$field_name]['values'], $this->template_fields[$field_name]['description']);
 		if (count($subobject->error)>0){
-			$error = array('field'=>$field_name,
-						   'error'=>$subobject->error);
-			array_push($this->error, $error);
+			if ($this->template_fields[$field_name]['presence'] == 'required'){
+				$error = array('field'=>$field_name,
+							   'error'=>$subobject->error);
+				array_push($this->error, $error);
+			}
+			else{
+				$warning = array('field'=>$field_name,
+							   'error'=>$subobject->error);
+				array_push($this->warning, $warning);
+			}
 		}
 
 
 		elseif (count($subobject->warning)>0){
-			$warning = array('field'=>$field_name,
-							'warning'=>$subobject->warning);
-			array_push($this->warning, $warning);
+			if ($this->template_fields[$field_name]['presence'] != 'required'){
+				$warning = array('field'=>$field_name,
+								'warning'=>$subobject->warning);
+				array_push($this->warning, $warning);
+			}
+			else{
+				$error = array('field'=>$field_name,
+							   'error'=>$subobject->warning);
+				array_push($this->error, $error);
+			}
 		}
 
 
@@ -351,6 +365,9 @@ class BSCProcessor extends stdClass{
 
 	protected function trigger_error($padding, $field_name, $field_value)
 	{
+
+		if (json_decode($field_value) != null){ $field_value = json_decode($field_value);}
+
 		if ($this->template_fields[$field_name]['presence'] == 'required')
 		{	
 			$output = $this->print_message($padding, $field_name, 'error', $field_value);
