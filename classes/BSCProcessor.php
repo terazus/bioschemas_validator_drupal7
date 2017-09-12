@@ -217,14 +217,18 @@ class BSCProcessor extends stdClass{
 		$subobject = new BSCsubProcessor($field_value, $field_name, $level, $this->template_fields[$field_name]['values'], $this->template_fields[$field_name]['description']);
 		if (count($subobject->error)>0){
 			$error = array('field'=>$field_name,
-						   'error'=>'error with subfield '.$subobject->error[0]['field']);
+						   'error'=>$subobject->error);
 			array_push($this->error, $error);
 		}
+
+
 		elseif (count($subobject->warning)>0){
 			$warning = array('field'=>$field_name,
-							'warning'=>'warning with subfield '.$subobject->warning[0]['field']);
+							'warning'=>$subobject->warning);
 			array_push($this->warning, $warning);
 		}
+
+
 		$message .= $subobject->message_output;	
 		return $message; 
 	}
@@ -360,7 +364,7 @@ class BSCProcessor extends stdClass{
 			$output = $this->print_message($padding, $field_name, 'warning', $field_value);
 			$local_warning = array(
 				'field'=>$field_name,
-				'error'=>$field_value);
+				'warning'=>$field_value);
 			array_push($this->warning, $local_warning);
 		}
 		return $output;
