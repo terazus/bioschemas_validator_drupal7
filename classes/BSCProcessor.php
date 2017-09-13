@@ -53,6 +53,8 @@ class BSCProcessor extends stdClass{
 			$spec_path = $path.$file_name.'.json';
 			$this->template_fields = $this->make_spec($spec_path);
 
+			//dpm($this->template_fields);
+
 			if ($this->template_fields!=null){
 				$result = $this->validate_json($this->values);
 				$this->message_output = '<tr class="first_line"><th class="first_col"></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th class="object_errors">'.count($this->error).' error(s) & '.
@@ -72,6 +74,7 @@ class BSCProcessor extends stdClass{
 		$raw_spec = json_decode(file_get_contents($file_path));
 		$properties = $raw_spec->{'properties'};
 		$spec = array();
+
 		foreach ($properties as $property_name => $property_spec) {
 
 			$field_spec = array();
@@ -96,27 +99,37 @@ class BSCProcessor extends stdClass{
 			}
 
 			$field_spec['type'] = array();
-			foreach ($property_spec->{'oneOf'} as $type_value){
-				if (!in_array($type_value->{'type'}, $field_spec['type']) and $type_value->{'type'}!='array'){			
-					if ($type_value->{'type'} =='object'){
+
+			foreach ($property_spec->{'oneOf'} as $type_value)
+			{
+				if (!in_array($type_value->{'type'}, $field_spec['type']) and $type_value->{'type'}!='array')
+				{			
+					if ($type_value->{'type'} =='object')
+					{
 						array_push($field_spec['type'], $type_value->{'type'});
 						$field_values = array(); 
-						foreach($type_value->{'properties'}->{'type'}->{'enum'} as $value){
+						foreach($type_value->{'properties'}->{'type'}->{'enum'} as $value)
+						{
 							array_push($field_values, str_replace('http://schema.org/', '', $value));
 						}
 						$field_spec['values'] = $field_values;
 					}
-					elseif ($type_value->{'type'} =='string'){
-						if (isset($type_value->{'format'})){
+					elseif ($type_value->{'type'} =='string')
+					{
+						if (isset($type_value->{'format'}))
+						{
 							array_push($field_spec['type'], $type_value->{'format'});
 						}
-						else{
+						else
+						{
 							array_push($field_spec['type'], $type_value->{'type'});
 						}
 
-						if (isset($type_value->{'enum'})){
+						if (isset($type_value->{'enum'}))
+						{
 							$field_spec['controlled_vocabulary'] = array();
-							foreach ($type_value->{'enum'} as $vocabulary_item){
+							foreach ($type_value->{'enum'} as $vocabulary_item)
+							{
 								array_push($field_spec['controlled_vocabulary'], $vocabulary_item);
 								
 							}
@@ -140,10 +153,11 @@ class BSCProcessor extends stdClass{
 		$padding = $this->sublevel*20;
 		$padding = $padding.'px';
 		$output = '';
-		$output = '' ;
+		$output = '' ;		
 
 		/* For each field in the json */
 		foreach ($json as $field_name=>$field_value){
+
 			if ($field_name!='@context' and $field_name!='@id'){
 
 				if(gettype($field_value) == 'string' and $field_name!='@type'){
@@ -243,7 +257,7 @@ class BSCProcessor extends stdClass{
 		}
 
 
-		$message .= $subobject->message_output;	
+		$message .= $subobject->message_output;
 		return $message; 
 	}
 
@@ -390,7 +404,8 @@ class BSCProcessor extends stdClass{
 }
 
 
-function typeof($val){
+function typeof($val)
+{
 	if (gettype($val)=='string'){
 		if (isDate(str_replace('.', '&', str_replace('/','-', $val)))) {
 			return 'date';
@@ -407,7 +422,8 @@ function typeof($val){
 	}
 }
 
-function isDate($date){
+function isDate($date)
+{
 	return (bool)strtotime($date);
 }
 

@@ -433,12 +433,14 @@ function make_header()
 				"description": "This tool is designed to validate the fields of a schema.org object based on Bioschemas specifications. It process a URL link to a page enhanced with schema.org markup and is able to read all three formats (Microdata, JSON-LD and RDFa).",
 				"url": "https://www.france-bioinformatique.fr/en/bioschemas_crawler",
 				"applicationCategory": ["Web Application"],
-				"license":{
+				"license":[
+				{
 					"@type": "CreativeWork",
 					"name": "LGPL-V3",
 					"url": "https://github.com/terazus/bioschemas_validator_drupal7/blob/master/LICENCE",
 					"description": "generic software licence"
-				},
+				}
+				],
 				"potentialAction": {
 					"@type": "ControlAction",
 					"object": {

@@ -32,7 +32,7 @@ class BSCsubProcessor extends BSCProcessor{
 			{
 
 				/* Let's first check if the provided @type value is the expected type for this field */
-				if (!in_array(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})), $type_expected) and isset($type_expected))
+				if ((!in_array(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})), $type_expected) and isset($type_expected)) or !isset($type_expected))
 				{
 					$result = $this->trigger_error($padding_plus, '@type', $json->{'@type'}.' is not a valid target for this field');
 				}
