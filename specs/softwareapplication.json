@@ -32,14 +32,12 @@
       "oneOf": [
         {
           "type":"string",
-          "format":"uri",
           "enum": ["EDAM/Operation"]
         },
         {
           "type": "array",
           "items": {
             "type": "string",
-            "format":"uri",
             "enum": ["EDAM/Operation"]
           }
         } 
@@ -166,6 +164,17 @@
           "items": {
             "type": "string",
             "format":"uri",
+            "enum": ["EDAM/Topic"]
+          }
+        },
+        {
+          "type":"string",
+          "enum": ["EDAM/Topic"]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
             "enum": ["EDAM/Topic"]
           }
         } 

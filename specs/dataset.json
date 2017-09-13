@@ -12,6 +12,10 @@
           "type":"string",
           "format":"uri",
           "enum":["EDAM/Format"]
+        },
+        {
+          "type":"string",
+          "enum":["EDAM/Format"]
         }
       ]
     }
