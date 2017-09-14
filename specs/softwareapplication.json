@@ -206,7 +206,7 @@
         }
       ]
     },
-    "offer": {
+    "offers": {
       "description": "An offer to provide this item. Expects an Offer object. If the tool is free, indicate 0.00 as price.",
       "oneOf":[
         {
@@ -317,7 +317,7 @@
     "applicationCategory",
     "keywords",
     "potentialAction",
-    "offer",
+    "offers",
     "softwareRequirements",
     "dateCreated",
     "dateModified",
