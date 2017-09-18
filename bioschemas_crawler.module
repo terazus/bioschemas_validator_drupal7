@@ -459,7 +459,7 @@ function make_header()
 				},
 				"Citation": {
 				    "@type":"CreativeWork",
-				  	"name": "RSAT: regulatory sequence analysis tools.",
+				  	"name": "My article Name",
 				    "url": "https://www.example.com/myarticle",
 					"description": "This is a description"
 				},
@@ -501,9 +501,31 @@ function make_header()
 						"email": "Null",
 						"description": "Null"
 					},
-					"license": "No license"
+					"license": "No license",
+					"applicationCategory": "Library",
+					"operatingSystem": "All",
+					"softwareRequirements": "Apache - PHP",
+					"offers": {
+						"@type": "Offer",
+						"price": "0",
+						"priceCurrency": "Null"
+					}
 				},
-				"operatingSystem":"All"
+				"operatingSystem":"All",
+				"softwareHelp": [
+					{
+					    "@type":"CreativeWork",
+					  	"name": "Documentation - advanced",
+					    "url": "https://www.example.com/advhelp",
+						"description": "How to use Bioschemas validator as an API"
+					},
+					{
+					    "@type":"CreativeWork",
+					  	"name": "Documentation - basics",
+					    "url": "https://www.example.com/stdhelp",
+						"description": "How to use Bioschemas validator as a web form"
+					}
+				]
 			}
 		]
 		</script>

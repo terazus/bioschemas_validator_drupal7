@@ -140,7 +140,41 @@
 
       ]
     },
+    "softwareHelp": {
+      "description" : "The documentation related to your tool (either provide a link and a CreativeWork if you wish to have more control)",
+      "oneOf": [
+        {
+          "type":"string",
+          "format":"uri"
+        },
+        {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type":{
+              "type": "string",
+              "enum": ["http://schema.org/CreativeWork"]
+            }
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties":{
+              "type":{
+                "type":"string", 
+                "enum": ["http://schema.org/CreativeWork"]
+              }
+            }
+          }
+        }
 
+      ]
+    },
     "applicationCategory": {
       "description" : "The EDAM toolType term",
       "oneOf": [
@@ -329,7 +363,8 @@
     "dateModified",
     "hasPart",
     "image",
-    "operatingSystem"
+    "operatingSystem",
+    "softwareHelp"
   ]
 
 }
