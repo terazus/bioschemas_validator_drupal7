@@ -56,8 +56,23 @@
           }
         }
       ]
+    },
+    "target" : {
+      "description" : "Template URL for APIs (use RFC6570 standard)",
+      "oneOf":[
+        {
+          "type":"object",
+          "properties":{
+            "type":{
+              "type":"string",
+              "enum": ["http://schema.org/EntryPoint"]
+            }
+          }
+        }
+      ]
     }
   },
+
   "recommended": [
     "result",
     "object"

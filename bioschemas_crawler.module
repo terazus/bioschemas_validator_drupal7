@@ -451,7 +451,11 @@ function make_header()
 					"result": {
 						"@type": "Dataset",
 						"additionalType": "http://edamontology.org/format_2331"
-					}
+					},
+					"target":{
+        				"@type": "EntryPoint",
+            			"urlTemplate": "https://www.france-bioinformatique.fr/{lang}/bioschemas_crawler{?url,format}&media=json"
+       				}
 				},
 				"Citation": {
 				    "@type":"CreativeWork",
@@ -498,7 +502,8 @@ function make_header()
 						"description": "Null"
 					},
 					"license": "No license"
-				}
+				},
+				"operatingSystem":"All"
 			}
 		]
 		</script>

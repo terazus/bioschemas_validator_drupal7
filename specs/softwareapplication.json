@@ -18,6 +18,12 @@
         {"type":"string"}
       ]
     },
+    "operatingSystem": {
+      "description" : "Operating system the tool is running on",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    },
     "url": {
       "description" : "Homepage URL of the tool. You can provide alternatives URL using sameAs.",
       "oneOf": [
@@ -322,7 +328,8 @@
     "dateCreated",
     "dateModified",
     "hasPart",
-    "image"
+    "image",
+    "operatingSystem"
   ]
 
 }
