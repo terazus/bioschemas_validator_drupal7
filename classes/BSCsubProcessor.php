@@ -57,7 +57,6 @@ class BSCsubProcessor extends BSCProcessor{
 				/* There is something in the warning attribute */
 				elseif (count($this->warning)>0) 
 				{
-					dpm($this->warning[0]['field']);
 					$output = $this->trigger_error($padding, $field_name, 'Problem with subfield '.json_encode($this->warning[0]['field']));
 					$this->message_output = $output.' '.$result;
 				}
