@@ -13,9 +13,19 @@
           "format":"uri"
         }
       ]
+    },
+    "httpMethod": {
+      "description": "HTTP method to use to use the data",
+      "oneOf": [
+        {
+          "type":"string",
+          "enum":["get", "post"]
+        }
+      ]
     }
   },
   "required":[
-    "urlTemplate"
+    "urlTemplate",
+    "httpMethod"
   ]
 }

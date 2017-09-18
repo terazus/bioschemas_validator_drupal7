@@ -21,7 +21,8 @@ require_once 'BSCsubProcessor.php';
  * @package BioschemasProcessor
  */
 
-class BSCProcessor extends stdClass{
+class BSCProcessor extends stdClass
+{
 
 	protected $template_fields;
 	public $message_output = '';
@@ -40,11 +41,13 @@ class BSCProcessor extends stdClass{
 	 * @param 	object 	$json 			A json-ld variable containing the fields to process
 	 * @return 	object 	BSCProcessor 	An object that processes the fields and containing an HTML table, an array of errors and an array of warnings.
 	 */
-	public function __construct($json) {
+	public function __construct($json) 
+	{
 		if (!isset($json)){
 			$this->errors=TRUE;
 		}
-		else { 
+		else 
+		{ 
 			$this->values = $json;
 			$file_name = strtolower(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"})));
 			if (!isset($json->{"@type"})){
@@ -57,7 +60,8 @@ class BSCProcessor extends stdClass{
 
 			//dpm($this->template_fields);
 
-			if ($this->template_fields!=null){
+			if ($this->template_fields!=null)
+			{
 				$result = $this->validate_json($this->values);
 				$this->message_output = '<tr class="first_line"><th class="first_col"></th><th class="field_name">'.$this->values->{'@type'}.'</th> <th class="object_errors">'.count($this->error).' error(s) & '.
 				count($this->warning).' warning(s) </th> </tr>'.$result;
@@ -72,7 +76,8 @@ class BSCProcessor extends stdClass{
 		}
 	}
 
-	protected function make_spec($file_path){
+	protected function make_spec($file_path)
+	{
 		$raw_spec = json_decode(file_get_contents($file_path));
 		$properties = $raw_spec->{'properties'};
 		$spec = array();
@@ -426,7 +431,17 @@ function typeof($val)
 
 function isDate($date)
 {
-	return (bool)strtotime($date);
+	//dpm(date('Y-m-d', strtotime($date)) == $date);
+	//return (date('Y-m-d', strtotime($date)) == $date);
+	//return (bool)strtotime($date);
+
+	if ($date == 'get' or (bool)strtotime($date) == false){
+		return false;
+	}
+	else{
+		return true;
+	}
+
 }
 
 
