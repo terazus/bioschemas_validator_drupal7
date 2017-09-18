@@ -455,7 +455,7 @@ function make_header()
 					"target":{
         				"@type": "EntryPoint",
             			"urlTemplate": "https://www.france-bioinformatique.fr/{lang}/bioschemas_crawler{?url,format}&media=json",
-            			"httpMethod" : "get"
+            			"httpMethod" : "nope first"
        				}
 				},
 				"Citation": {

@@ -155,7 +155,8 @@ class BSCProcessor extends stdClass
 		return '<table class="bioschemas_validation">'.$this->message_output.'</table>';
 	}
 
-	protected function validate_json($json){
+	protected function validate_json($json)
+	{
 
 		$padding = $this->sublevel*20;
 		$padding = $padding.'px';
@@ -236,7 +237,9 @@ class BSCProcessor extends stdClass
 
 		$field_name = str_replace('http://schema.org/', '', $field_name);
 		$subobject = new BSCsubProcessor($field_value, $field_name, $level, $this->template_fields[$field_name]['values'], $this->template_fields[$field_name]['description'], $this->parent);
+
 		if (count($subobject->error)>0){
+
 			if ($this->template_fields[$field_name]['presence'] == 'required'){
 				$error = array('field'=>$field_name,
 							   'error'=>$subobject->error);
