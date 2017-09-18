@@ -1,0 +1,41 @@
+{
+
+  "title":"PostalAddress",
+
+  "type": "object",
+
+  "properties": {
+
+    "name":{
+      "description" : "",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    },
+    "streetAddress": {
+      "description" : "",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    },
+    "addressLocality": {
+      "description" : "",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    },
+    "addressCountry": {
+      "description" : "",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    }
+  },
+  "recommended": [
+    "name",
+    "streetAddress",
+    "addressCountry ",
+    "addressLocality"
+  ]
+}
+

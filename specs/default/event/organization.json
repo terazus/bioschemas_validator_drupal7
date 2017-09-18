@@ -1,0 +1,35 @@
+{
+
+  "title":"Organization",
+
+  "type": "object",
+
+  "properties": {
+
+    "name":{
+      "description" : "",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    },
+    "description": {
+      "description" : "",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    },
+    "email": {
+      "description" : "",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    }
+  },
+  "required":[
+    "name"
+  ],
+  "recommended": [
+    "description",
+    "email"
+  ]
+}
