@@ -434,10 +434,6 @@ function typeof($val)
 
 function isDate($date)
 {
-	//dpm(date('Y-m-d', strtotime($date)) == $date);
-	//return (date('Y-m-d', strtotime($date)) == $date);
-	//return (bool)strtotime($date);
-
 	if ($date == 'get' or (bool)strtotime($date) == false){
 		return false;
 	}

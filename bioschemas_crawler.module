@@ -453,9 +453,9 @@ function make_header()
 						"additionalType": "http://edamontology.org/format_2331"
 					},
 					"target":{
-        				"@type": "EntryPoint",
+        				"@type": "test",
             			"urlTemplate": "https://www.france-bioinformatique.fr/{lang}/bioschemas_crawler{?url,format}&media=json",
-            			"httpMethod" : "nope first"
+            			"httpMethod" : "get"
        				}
 				},
 				"Citation": {
