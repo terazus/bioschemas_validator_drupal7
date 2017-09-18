@@ -1,0 +1,21 @@
+{
+
+  "title":"EntryPoint",
+
+  "type": "object",
+
+  "properties": {
+    "urlTemplate": {
+      "description" : "URL template",
+      "oneOf": [
+        {
+          "type":"string",
+          "format":"uri"
+        }
+      ]
+    }
+  },
+  "required":[
+    "urlTemplate"
+  ]
+}

@@ -4,8 +4,9 @@ class BSCsubProcessor extends BSCProcessor{
 
 	var $sublevel;
 	var $field_name;
+	var $parent;
 
-	function __construct($json, $field_name, $level, $type_expected, $field_description)
+	function __construct($json, $field_name, $level, $type_expected, $field_description, $parent)
 	{
 		$field_name = str_replace('https://schema.org/', '', str_replace('http://schema.org/', '', str_replace('_', '@', $field_name))) ; 
 		if (!isset($json))
@@ -15,6 +16,7 @@ class BSCsubProcessor extends BSCProcessor{
 
 		else 
 		{
+			$this->parent = $parent;
 			$this->values = $json;
 			$this->field_name = $field_name;
 			$this->sublevel = $level;
@@ -23,7 +25,7 @@ class BSCsubProcessor extends BSCProcessor{
 			$padding = $padding.'px';
 			$padding_plus = $padding_plus.'px';
 
-			$path = './sites/all/modules/CUSTOM/bioschemas_crawler/specs/';
+			$path = './sites/all/modules/CUSTOM/bioschemas_crawler/specs/default/'.$parent.'/';
 			$spec_path = $path.strtolower(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"@type"}))).'.json';			
 			$this->template_fields = $this->make_spec($spec_path);
 

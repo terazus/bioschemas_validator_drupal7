@@ -29,6 +29,7 @@ class BSCProcessor extends stdClass{
 	public $error = array();
 	public $warning = array();
 	protected $sublevel = 1;
+	protected $parent;
 
 
 	/**
@@ -49,8 +50,9 @@ class BSCProcessor extends stdClass{
 			if (!isset($json->{"@type"})){
 				$file_name = strtolower(str_replace('http://schema.org/','',str_replace('https://schema.org/', '', $json->{"_type"})));
 			}
-			$path = './sites/all/modules/CUSTOM/bioschemas_crawler/specs/';
-			$spec_path = $path.$file_name.'.json';
+			$path = './sites/all/modules/CUSTOM/bioschemas_crawler/specs/default/';
+			$this->parent = $file_name;
+			$spec_path = $path.$file_name.'/'.$file_name.'.json';
 			$this->template_fields = $this->make_spec($spec_path);
 
 			//dpm($this->template_fields);
@@ -228,7 +230,7 @@ class BSCProcessor extends stdClass{
 	{
 
 		$field_name = str_replace('http://schema.org/', '', $field_name);
-		$subobject = new BSCsubProcessor($field_value, $field_name, $level, $this->template_fields[$field_name]['values'], $this->template_fields[$field_name]['description']);
+		$subobject = new BSCsubProcessor($field_value, $field_name, $level, $this->template_fields[$field_name]['values'], $this->template_fields[$field_name]['description'], $this->parent);
 		if (count($subobject->error)>0){
 			if ($this->template_fields[$field_name]['presence'] == 'required'){
 				$error = array('field'=>$field_name,
