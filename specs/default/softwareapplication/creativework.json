@@ -26,6 +26,15 @@
           "format":"uri"
         }
       ]
+    },
+    "sameAs": {
+      "description" : "Used to fill a DOI/PMID",
+      "oneOf": [
+        {
+          "type":"string",
+          "format":"uri"
+        }
+      ]
     }
   },
   "required":[

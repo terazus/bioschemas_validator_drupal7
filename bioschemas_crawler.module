@@ -446,14 +446,16 @@ function make_header()
 					"@type": "ControlAction",
 					"object": {
 						"@type": "Dataset",
-						"additionalType": "http://edamontology.org/format_3749"
+						"additionalType": "http://edamontology.org/format_3749",
+						"variableMeasured":"http://edamontology.org/data_2042"
 					},
 					"result": {
 						"@type": "Dataset",
-						"additionalType": "http://edamontology.org/format_2331"
+						"additionalType": "http://edamontology.org/format_2331",
+						"variableMeasured":"http://edamontology.org/data_2042"
 					},
 					"target":{
-        				"@type": "test",
+        				"@type": "EntryPoint",
             			"urlTemplate": "https://www.france-bioinformatique.fr/{lang}/bioschemas_crawler{?url,format}&media=json",
             			"httpMethod" : "get"
        				}
@@ -462,7 +464,8 @@ function make_header()
 				    "@type":"CreativeWork",
 				  	"name": "My article Name",
 				    "url": "https://www.example.com/myarticle",
-					"description": "This is a description"
+					"description": "This is a description",
+					"sameAs": "https://doi.org/MY/DOI"
 				},
 				"keywords":["http://edamontology.org/topic_3345"],
 				"softwareVersion": "1.0",

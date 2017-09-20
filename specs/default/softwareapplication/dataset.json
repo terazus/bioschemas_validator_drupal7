@@ -6,7 +6,7 @@
 
   "properties": {
     "additionalType": {
-      "description" : "Fill in an url to an EDAM term",
+      "description" : "Fill in an url to an EDAM term from the FORMAT table",
       "oneOf": [
         {
           "type":"string",
@@ -18,9 +18,26 @@
           "enum":["EDAM/Format"]
         }
       ]
+    },
+    "variableMeasured": {
+      "description" : "Fill in an url to an EDAM term from DATA table",
+      "oneOf": [
+        {
+          "type":"string",
+          "format":"uri",
+          "enum":["EDAM/Data"]
+        },
+        {
+          "type":"string",
+          "enum":["EDAM/Data"]
+        }
+      ]
     }
   },
   "required":[
     "additionalType"
+  ],
+  "recommended":[
+    "variableMeasured"
   ]
 }
