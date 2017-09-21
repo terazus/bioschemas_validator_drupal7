@@ -191,8 +191,7 @@ class BSCProcessor extends stdClass
 
 						// MULTIPLE VALUES ERROR
 						$local_error = array(
-							"field"=>$field_name,
-							"error"=>"Multiple values not allowed");
+							$field_name=>"Multiple values not allowed");
 						$output.='<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value error_field"> Multiple values are not allowed for that field </td> </tr>';
 						array_push($this->error, $local_error);
 					}
@@ -211,8 +210,7 @@ class BSCProcessor extends stdClass
 
 					// REQUIRED FIELD MISSING ERROR
 					$local_error = array(
-							"field"=>$field_name,
-							"error"=>"Required field missing");
+							$field_name=>"Required field missing");
 					$output .= '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"></td><td class="field_name error_field" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value error_field"> A required field is missing </td> </tr>';
 					array_push($this->error, $local_error);
 				}
@@ -222,8 +220,7 @@ class BSCProcessor extends stdClass
 
 					// RECOMMENDED FIELD MISSING ERROR
 					$local_warning = array(
-							"field"=>$field_name,
-							"warning"=>"A recommended field missing");
+							$field_name=>"A recommended field missing");
 					$output .= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning"> A recommended field is missing </td> </tr>';
 					array_push($this->warning, $local_warning);
 				}
@@ -241,8 +238,7 @@ class BSCProcessor extends stdClass
 		if (count($subobject->error)>0){
 
 			if ($this->template_fields[$field_name]['presence'] == 'required'){
-				$error = array('field'=>$field_name,
-							   'error'=>$subobject->error);
+				$error = array($field_name=>$subobject->error);
 				array_push($this->error, $error);
 			}
 			else{
@@ -255,8 +251,7 @@ class BSCProcessor extends stdClass
 
 		elseif (count($subobject->warning)>0){
 			if ($this->template_fields[$field_name]['presence'] != 'required'){
-				$warning = array('field'=>$field_name,
-								'warning'=>$subobject->warning);
+				$warning = array($field_name=>$subobject->warning);
 				array_push($this->warning, $warning);
 			}
 			else{
@@ -396,16 +391,14 @@ class BSCProcessor extends stdClass
 		{	
 			$output = $this->print_message($padding, $field_name, 'error', $field_value);
 			$local_error = array(
-				'field'=>$field_name,
-				'error'=>$field_value);
+				$field_name=>$field_value);
 			array_push($this->error, $local_error);	
 		}
 		else
 		{
 			$output = $this->print_message($padding, $field_name, 'warning', $field_value);
 			$local_warning = array(
-				'field'=>$field_name,
-				'warning'=>$field_value);
+				$field_name=>$field_value);
 			array_push($this->warning, $local_warning);
 		}
 		return $output;
