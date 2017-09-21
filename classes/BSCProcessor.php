@@ -190,39 +190,30 @@ class BSCProcessor extends stdClass
 					else{
 
 						// MULTIPLE VALUES ERROR
-						$local_error = array(
-							$field_name=>"Multiple values not allowed");
 						$output.='<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value error_field"> Multiple values are not allowed for that field </td> </tr>';
-						array_push($this->error, $local_error);
+						$this->set_error($field_name, 'Multiple values not allowed','error'); 
+						#TWEEK FOR ERROR/WARNING DEPENDING ON PRESENCE (REQUIRED OR NOT)
 					}
-				}
-
-				else{
-
 				}
 			}
 		}
 
 		// ERRORS AND WARNINGS FOR MISSING FIELDS
-		foreach ($this->template_fields as $field_name=>$field_value){
+		foreach ($this->template_fields as $field_name=>$field_value) {
 			if ($field_value['presence'] == 'required'){
 				if (!isset($json->{$field_name})){
 
 					// REQUIRED FIELD MISSING ERROR
-					$local_error = array(
-							$field_name=>"Required field missing");
 					$output .= '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"></td><td class="field_name error_field" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value error_field"> A required field is missing </td> </tr>';
-					array_push($this->error, $local_error);
+					$this->set_error($field_name, "A required field is missing", "error");
 				}
 			}
 			elseif ($field_value['presence'] == 'recommended'){
 				if (!isset($json->{$field_name})){
 
 					// RECOMMENDED FIELD MISSING ERROR
-					$local_warning = array(
-							$field_name=>"A recommended field missing");
 					$output .= '<tr class="table_line"> <td class="fa first_col fa-exclamation-triangle" aria-hidden="true"></td><td class="field_name field_warning" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value field_warning"> A recommended field is missing </td> </tr>';
-					array_push($this->warning, $local_warning);
+					$this->set_error($field_name, "A recommended field is missing", "warning");
 				}
 			}
 		}
@@ -238,26 +229,20 @@ class BSCProcessor extends stdClass
 		if (count($subobject->error)>0){
 
 			if ($this->template_fields[$field_name]['presence'] == 'required'){
-				$error = array($field_name=>$subobject->error);
-				array_push($this->error, $error);
+				$this->set_error($field_name, $subobject->error, 'error');
 			}
 			else{
-				$warning = array('field'=>$field_name,
-							   'error'=>$subobject->error);
-				array_push($this->warning, $warning);
+				$this->set_error($field_name, $subobject->error, 'warning');
 			}
 		}
 
 
 		elseif (count($subobject->warning)>0){
-			if ($this->template_fields[$field_name]['presence'] != 'required'){
-				$warning = array($field_name=>$subobject->warning);
-				array_push($this->warning, $warning);
+			if ($this->template_fields[$field_name]['presence'] == 'required') {
+				$this->set_error($field_name, $subobject->warning, 'error');
 			}
-			else{
-				$error = array('field'=>$field_name,
-							   'error'=>$subobject->warning);
-				array_push($this->error, $error);
+			else {
+				$this->set_error($field_name, $subobject->warning, 'warning');
 			}
 		}
 
@@ -341,8 +326,7 @@ class BSCProcessor extends stdClass
 			// UNEXPECTED TARGET TYPE ERROR
 			if ($field_name!='@type'){
 				$output.= '<tr class="table_line"> <td class="fa first_col fa-times-circle" aria-hidden="true"> </td> <td class="field_name error_field" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value error_field">'.typeof($field_value).' is not a valid target for field '.$field_name.'</td></tr>';
-				$local_error = array('field'=>$field_name, 'error'=>"unexpected type as target");
-				array_push($this->error, $local_error);
+				$this->set_error($field_name, 'Unexpected type as target', 'error');
 			}
 			else{
 				$output.= '<tr class="table_line"> <td class="fa first_col fa-check-circle" aria-hidden="true"> </td> <td class="field_name" style="padding-left:'.$padding.'">'.$field_name.'</td><td class="field_value">'.$field_value.'</td></tr>';
@@ -390,21 +374,45 @@ class BSCProcessor extends stdClass
 		if ($this->template_fields[$field_name]['presence'] == 'required')
 		{	
 			$output = $this->print_message($padding, $field_name, 'error', $field_value);
-			$local_error = array(
-				$field_name=>$field_value);
-			array_push($this->error, $local_error);	
+			//$local_error = array($field_name=>$field_value);
+			$this->set_error($field_name, $field_value, 'error');
+
 		}
 		else
 		{
 			$output = $this->print_message($padding, $field_name, 'warning', $field_value);
-			$local_warning = array(
-				$field_name=>$field_value);
-			array_push($this->warning, $local_warning);
+			//$local_warning = array($field_name=>$field_value);
+			$this->set_error($field_name, $field_value, 'warning');
 		}
 		return $output;
 	} 
 
+	protected function set_error($field_name, $field_value, $status){
+		if ($status == 'error') {
+			if (!isset($this->error[$field_name])) {
+				$this->error[$field_name] = array();
+				array_push($this->error[$field_name], $field_value);
+			}
+			else {
+				array_push($this->error[$field_name], $field_value);	
+			}
+		}
+		elseif ($status=='warning'){
+			if (!isset($this->warning[$field_name])) {
+				$this->warning[$field_name] = array();
+				array_push($this->warning[$field_name], $field_value);
+			}
+			else {
+				array_push($this->warning[$field_name], $field_value);	
+			}
+		}
+
+
+	}
+
+
 }
+
 
 
 function typeof($val)

@@ -40,6 +40,7 @@ function bioschemas_crawler_page($form, &$form_state)
 
 	if ($api_media == 'json')
 	{
+		header('Content-type: application/json');
 		if (isset($api_format) and isset($api_url))
 		{
 			if ($api_format=='microdata')
@@ -148,8 +149,8 @@ function bioschemas_crawler_page($form, &$form_state)
 							$item_counter ++;
 							echo '{';
 							$tool = new BSCProcessor($newtool);
-							echo '"error": '.json_encode($tool->error).',';
-							echo '"warning": '.json_encode($tool->warning).',';
+							echo '"error": '.json_encode($tool->error, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).',';
+							echo '"warning": '.json_encode($tool->warning, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).',';
 							echo '"json": '.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 							echo '}';
 							if ($item_counter!=$item_limit)
@@ -164,8 +165,8 @@ function bioschemas_crawler_page($form, &$form_state)
 						echo '{';
 						$json = preg_replace("/[\r\n\t]+/", '', $json);
 						$tool = new BSCProcessor(json_decode($json));
-						echo '"error": '.json_encode($tool->error).',';
-						echo '"warning": '.json_encode($tool->warning).',';
+						echo '"error": '.json_encode($tool->error, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).',';
+						echo '"warning": '.json_encode($tool->warning, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).',';
 						echo '"json": '.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 						echo '}';
 					}
@@ -179,8 +180,8 @@ function bioschemas_crawler_page($form, &$form_state)
 							$item_counter ++;
 							echo '{';
 							$tool = new BSCProcessor($newobject);
-							echo '"error": '.json_encode($tool->error).',';
-							echo '"warning": '.json_encode($tool->warning).',';
+							echo '"error": '.json_encode($tool->error, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).',';
+							echo '"warning": '.json_encode($tool->warning, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).',';
 							echo '"json": '.json_encode($tool->values, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 							echo '}';
 							if ($item_counter!=$item_limit)
