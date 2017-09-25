@@ -1,0 +1,361 @@
+{
+  "title":"SoftwareApplication",
+  "type": "object",
+  "properties": {
+    "name":{
+      "description" : "The name of the tool or application",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    },
+    "description": {
+      "description" : "A short description of the tool given to provide users with a quick insight",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    },
+    "operatingSystem": {
+      "description" : "Operating system the tool is running on",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    },
+    "url": {
+      "description" : "Homepage URL of the tool. You can provide alternatives URL using sameAs.",
+      "oneOf": [
+        {
+          "type":"string",
+          "format":"uri"
+        }
+      ]
+    },
+    "featureList": {
+      "description" : "An EDAM operation ID or URL",
+      "oneOf": [
+        {
+          "type":"string",
+          "enum": ["EDAM/Operation"]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["EDAM/Operation"]
+          }
+        } 
+      ]
+    },
+    "softwareVersion": {
+      "description" : "The tool version for which these metadata are provided",
+      "oneOf": [
+        {"type":"string"}
+      ] 
+    },
+
+    "publisher" : {
+      "description" : "Publisher of the tool, you can either enter a Person or an Organization",
+      "oneOf":[
+        {
+          "type": "object",
+          "properties":{
+            "type":{
+              "type": "string",
+              "enum": ["http://schema.org/Organization", "http://schema.org/Person"]
+            }
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties" : {
+              "type": {
+                "type": "string",
+                "enum": ["http://schema.org/Organization", "http://schema.org/Person"]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Citation" : {
+      "description" : "Article that uses or quotes this tool. This field expects a CreativeWork object.",
+      "oneOf":[
+        {
+          "type": "object",
+          "properties":{
+            "type":{
+              "type": "string",
+              "enum": ["http://schema.org/CreativeWork"]
+            }
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties" : {
+              "type": {
+                "type": "string",
+                "enum": ["http://schema.org/CreativeWork"]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "license": {
+      "description" : "An EDAM operation ID or URL",
+      "oneOf": [
+        {"type":"string"},
+        {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type":{
+              "type": "string",
+              "enum": ["http://schema.org/CreativeWork"]
+            }
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties":{
+              "type":{
+                "type":"string", 
+                "enum": ["http://schema.org/CreativeWork"]
+              }
+            }
+          }
+        }
+
+      ]
+    },
+    "softwareHelp": {
+      "description" : "The documentation related to your tool (either provide a link and a CreativeWork if you wish to have more control)",
+      "oneOf": [
+        {
+          "type":"string",
+          "format":"uri"
+        },
+        {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type":{
+              "type": "string",
+              "enum": ["http://schema.org/CreativeWork"]
+            }
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties":{
+              "type":{
+                "type":"string", 
+                "enum": ["http://schema.org/CreativeWork"]
+              }
+            }
+          }
+        }
+
+      ]
+    },
+    "applicationCategory": {
+      "description" : "The EDAM toolType term",
+      "oneOf": [
+        {
+          "type":"string",
+          "enum": ["Command-line tool", "Database portal", "Desktop Application", "Library", "Ontologies", "Plug-in", "Script", "SPARQL", "Endpoint", "Suite", "Web Application", "Web API", "Web Service", "Workbench", "Worfklow"]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["Command-line tool", "Database portal", "Desktop Application", "Library", "Ontologies", "Plug-in", "Script", "SPARQL", "Endpoint", "Suite", "Web Application", "Web API", "Web Service", "Workbench", "Worfklow"]
+          }
+        } 
+      ]
+    },
+    "keywords": {
+      "description" : "The EDAM topic of the tool. Provide either an EDAM ID or an EDAM URL",
+      "oneOf": [
+        {
+          "type":"string",
+          "format":"uri",
+          "enum": ["EDAM/Topic"]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format":"uri",
+            "enum": ["EDAM/Topic"]
+          }
+        },
+        {
+          "type":"string",
+          "enum": ["EDAM/Topic"]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["EDAM/Topic"]
+          }
+        } 
+      ]
+    },
+    "potentialAction": {
+      "description": "Input, Output and API's URLs templates",
+      "oneOf":[
+        {
+          "type": "object",
+          "properties":{
+            "type":{
+              "type": "string",
+              "enum": ["http://schema.org/ControlAction"]
+            }
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties" : {
+              "type": {
+                "type": "string",
+                "enum": ["http://schema.org/ControlAction"]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "offers": {
+      "description": "An offer to provide this item. Expects an Offer object. If the tool is free, indicate 0.00 as price.",
+      "oneOf":[
+        {
+          "type": "object",
+          "properties":{
+            "type":{
+              "type": "string",
+              "enum": ["http://schema.org/Offer"]
+            }
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties" : {
+              "type": {
+                "type": "string",
+                "enum": ["http://schema.org/Offer"]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "softwareRequirements": {
+      "description": "Requierements before using the tool",
+      "oneOf": [
+        {"type":"string"},
+        {
+          "type": "array",
+          "items": {"type": "string"}
+        } 
+      ]
+    },
+    "dateCreated": {
+      "description": "Date the tool was created",
+      "oneOf": [
+        {
+          "type": "string",
+          "format":"date"
+        }
+      ]
+    },
+    "dateModified": {
+      "description": "Latest update date of the tool",
+      "oneOf": [
+        {
+          "type": "string",
+          "format":"date"
+        }
+      ]
+    },
+    "image": {
+      "description" : "An URL to the tool logo. If this field is empty the IFB logo will be used to used to build the snippet",
+      "oneOf": [
+        {
+          "type":"string",
+          "format":"uri"
+        }
+      ]
+    },
+    "hasPart":{
+      "description":"Use this field to describe tools included into a suite (a SoftwareApplication is expected)",
+       "oneOf": [
+        {
+          "type": "object",
+          "properties" : {
+            "type": {
+              "type": "string",
+              "enum": ["http://schema.org/SoftwareApplication"]
+            }
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties" : {
+              "type": {
+                "type": "string",
+                "enum": ["http://schema.org/SoftwareApplication"]
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "required": [
+    "name",
+    "description",
+    "url",
+    "featureList",
+    "softwareVersion"
+  ],
+  "recommended": [
+    "publisher",
+    "citation",
+    "license"
+  ],
+  "optional":[
+    "applicationCategory",
+    "keywords",
+    "potentialAction",
+    "offers",
+    "softwareRequirements",
+    "dateCreated",
+    "dateModified",
+    "hasPart",
+    "image",
+    "operatingSystem",
+    "softwareHelp"
+  ]
+
+}

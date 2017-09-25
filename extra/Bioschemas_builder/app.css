@@ -1,0 +1,147 @@
+/* GENERAL */
+html {
+	padding:10px;
+}
+
+
+
+/* TOP HEADER */
+.page_header{
+	width:99%;
+	height:95px;
+	position:fixed;
+	background-color: #7bb5dd;
+	z-index:1;
+}
+
+.menu_items{
+	top:25px;
+	margin-left: 25px;
+}
+
+.menu_item_container{
+	border-radius:0px !important;
+	margin-right:5px;
+	padding:0;
+	height:40px;
+}
+
+.menu_item{
+	text-align: center;
+	text-transform: uppercase;
+	font-weight: bold;
+	font-size:14px;
+	color:#529ed3;
+}
+
+.menu_item_container:focus,
+.menu_item_container:active,
+.menu_item_container:hover
+{
+	background-color: #204d74;
+    border-color: #122b40;
+    cursor:pointer;
+}
+
+.menu_item_container a{
+	display:block;
+	line-height: 14px;
+	height:100%;
+	padding-top: 12px;
+	text-decoration: none;
+
+}
+
+.menu_item_container a:hover,
+.menu_item_container a:focus,
+.menu_item_container a:active{
+	color:#A9D74A;
+	background-color: #204d74;
+    border-color: #122b40;
+}
+
+
+/* ************** MAIN PAGE ************** */
+
+/* General */
+.page_main{
+	width:100%;
+	border:1px solid #ccc;
+	top:105px;
+	position: relative;
+	height:87vh;
+	overflow-y:scroll 
+}
+
+.bottom_container{
+	height:100%;
+}
+
+/* Left pannel */
+.field_selector{
+	min-height:100%;
+	max-height: 100%;
+	background-color: black;
+	color:white;
+	overflow: scroll;
+}
+
+.field_selector h3{
+	text-align: center;
+}
+
+.addfield_button{
+	color: black ;
+	background-color: #A9D74A;
+	width:160px;
+	border:1px solid  white;
+	padding:10px;
+	text-align: center;
+	margin-bottom: 10px;
+	margin-right: auto;
+	margin-left: auto;
+}
+.addfield_button:hover{
+	cursor:pointer;
+}
+
+/* Middle Pannel */
+.field_values_container{
+	padding: 20px 10px;
+	height:100%;
+}
+
+.field_values{
+	border-right:1px solid #ccc;
+	height:100%;
+}
+
+/* Right Pannel */
+.current_object{
+	height:100%;
+	padding:10px 1px;
+}
+
+.object_block{
+	position: fixed;
+	background-color: #f1f1f1;
+	width:32%;
+	padding:10px;
+	max-height:500px;
+	overflow-y:scroll;
+	border:2px solid #7bb5dd;
+}
+
+.current_object h3{
+	margin:0px;
+}
+
+.right_menu_items{
+	margin-bottom:0px;
+	margin-top: 0px;
+}
+
+.right_menu_details {
+	top:-1px;
+	position: relative;
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<HTML ng-app="builder">
+
+	<HEAD>
+	<link rel="stylesheet" type='text/css' href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+	<link rel="stylesheet" type='text/css' href="app.css"/>
+
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/i18n/angular-locale_br-fr.js"></script>
+	<script type="text/javascript" src="app.js"></script>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	</HEAD>
+
+	<BODY ng-controller="BuilderController as builder" id="mycontroller">
+
+		<div ng-controller="CreateController as creator">
+			<!-- HEADER -->
+			<div class='page_header container-fluid'>
+				<div class="row">
+					<div class="logo col-lg-2">
+						<img src='https://www.france-bioinformatique.fr/sites/default/files/ifb-logo_1.png' alt='logo' />
+					</div>
+					<ul class="list-group col-lg-9 menu_items">
+						<li class="list-group-item col-lg-1 menu_item_container" ng-repeat="item in builder.items">
+							<a href class="menu_item" ng-click="$parent.$parent.tab.v1 = $index"> {{item.name}} </a>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+
+			<!-- MAIN SECTION, LEFT PART -->
+			<div class="container-fluid page_main">
+				<div class="row bottom_container">
+
+
+
+					<div class="field_selector col-lg-2"> 
+						<h3> Add fields from this menu </h3>
+						<div ng-repeat="item in creator.values" ng-show='tab.v1 === $index'> 
+							<div class="addfield_button" ng-repeat='field in item.fields' ng-click="$parent.$parent.tab.v2 = field"> {{field.field_name}} </div>
+						</div>
+					</div>
+
+
+
+					<div class="field_values_container col-lg-5"> 
+						<div class="field_values" style="display:none;"> 
+							<div> 
+								<div class="field_name">
+									<h4> Field name: </h4>
+									{{tab.v2.field_name}}
+								</div>
+								<div class="field_properties">
+									<h4> Field description: </h4> 
+									{{tab.v2.field_prop.description}}
+								</div>
+								<h4> Expected types: </h4>
+								<ul>
+									<div class="field_value" ng-repeat='field in tab'>
+										<div class="field_value" ng-repeat='test in field'>
+											 <li class="field_value" ng-repeat='test2 in test.oneOf'> {{test2.type}} </li>
+										</div>
+									</div>
+								<ul>
+							</div>
+						</div>
+					</div>
+
+					<div class="current_object col-lg-4">
+						<div class="object_block"> 
+							<ul class="list-group row right_menu_items">
+								<li class="list-group-item col-lg-6"> <h3>Current object </h3> </li>
+								<li class="list-group-item col-lg-6"> <h3>JSON-Code </h3> </li>
+							</ul>
+							<ul class="list-group row right_menu_details"> 
+								<li class="list-group-item"> The details of your object will appear here once you've started adding fields. You can navigate between the current object HTML view and the corresponding JSON-LD code by clicking to tabs at the top of this box. </li> 
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</BODY>
+
+
+</HTML>
