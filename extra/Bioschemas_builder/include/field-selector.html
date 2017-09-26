@@ -1,0 +1,4 @@
+<h3> Add fields from this menu </h3>
+<div ng-repeat="item in creator.values" ng-show='panel.isSelected($index)'> 
+	<div class="addfield_button" ng-repeat='field in item.fields track by $index' ng-click="panel.selectSubTab(); panel.subValue = field"> {{field.field_name}} </div>
+</div>

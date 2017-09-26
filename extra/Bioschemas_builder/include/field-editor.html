@@ -1,0 +1,49 @@
+<div> 
+	<div class="field_name">
+		<h4> Field name: </h4>
+		<div class="field_details">{{panel.subValue.field_name}}</div>
+		<hr>
+	</div>
+	<div class="field_properties">
+		<h4> Field description: </h4> 
+		<div class="field_details">{{panel.subValue.description}}</div>
+		<hr>
+	</div>
+	<div class="field_types">
+		<h4> Expected types: </h4>
+		<ul>
+			<div class="field_value" ng-repeat='field in panel.subValue.expected_types'>
+				<li class="field_value"> {{field}} </li>
+			</div>
+		</ul>
+		<hr>
+	</div>
+	<div class="vocabulary" ng-show="panel.subValue.vocabulary">
+		<h4> Controlled Vocabulary: </h4> 
+		<ul>
+			<div class="field_value" ng-repeat='field in panel.subValue.vocabulary'>
+				<li class="field_value"> {{field}} </li>
+			</div>
+		</ul>
+		<hr>
+	</div>	
+	<div class="cardinality">
+		<h4> Multiple values allowed: </h4>
+		<div class="field_details" ng-show="panel.subValue.cardinality===false"> No </div>
+		<div class="field_details" ng-show="panel.subValue.cardinality===true"> Yes </div>
+		<hr>
+	</div>
+	<div class="presence">
+		<h4> State: </h4>
+		<div class="field_details">This field is {{panel.subValue.state}} </div>
+		<hr>
+	</div>
+
+	<!-- Will need a form controller to handle objects, cardinality and vocabularies -->
+	<form name="{{'form_'+ panel.subValue.field_name}}" ng-submit="output.addItem()">
+		<label><h4>Use the following form to add values to this field </h4></label><BR>
+		<input type="text" id="{{ 'input_' + panel.subValue.field_name }}" ng-model="output.json[panel.subValue.field_name]"/>
+		<input ng-show="panel.subValue.cardinality===true" />
+		<BR ng-show="panel.subValue.cardinality===true"><BR ng-show="panel.subValue.cardinality===true">
+	</form>
+</div>

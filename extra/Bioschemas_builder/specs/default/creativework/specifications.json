@@ -1,0 +1,44 @@
+{
+  "title":"CreativeWork",
+  "type": "object",
+  "properties": {
+
+    "name":{
+      "description" : "",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    },
+    "description": {
+      "description" : "",
+      "oneOf": [
+        {"type":"string"}
+      ]
+    },
+    "url": {
+      "description" : "",
+      "oneOf": [
+        {
+          "type":"string",
+          "format":"uri"
+        }
+      ]
+    },
+    "sameAs": {
+      "description" : "Used to fill a DOI/PMID",
+      "oneOf": [
+        {
+          "type":"string",
+          "format":"uri"
+        }
+      ]
+    }
+  },
+  "required":[
+    "name",
+    "url"
+  ],
+  "recommended": [
+    "description"
+  ]
+}

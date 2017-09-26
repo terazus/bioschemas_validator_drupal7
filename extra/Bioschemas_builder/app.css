@@ -11,6 +11,12 @@ hr{
 	margin:0px;
 }
 
+pre {
+    -moz-tab-size:    4; /* Firefox 4+ */
+    -o-tab-size:      4; /* Opera 11.5 & 12.1 only */
+    tab-size:         4; /* Chrome 21+, Safari 6.1+, Opera 15+ */
+}
+
 
 /* TOP HEADER */
 .page_header{
@@ -90,7 +96,7 @@ hr{
 	max-height: 100%;
 	background-color: #7bb5dd;
 	color:white;
-	overflow: scroll;
+	overflow-y: scroll;
 }
 
 .field_selector h3{
