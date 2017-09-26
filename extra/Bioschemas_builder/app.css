@@ -3,6 +3,13 @@ html {
 	padding:10px;
 }
 
+html *{
+	font-family:"Segoe UI",Arial,sans-serif !important;
+}
+
+hr{
+	margin:0px;
+}
 
 
 /* TOP HEADER */
@@ -81,7 +88,7 @@ html {
 .field_selector{
 	min-height:100%;
 	max-height: 100%;
-	background-color: black;
+	background-color: #7bb5dd;
 	color:white;
 	overflow: scroll;
 }
@@ -92,14 +99,16 @@ html {
 
 .addfield_button{
 	color: black ;
-	background-color: #A9D74A;
-	width:160px;
-	border:1px solid  white;
+	background-color: white;
+	width:170px;
+	border:1px solid #7bb5dd;
 	padding:10px;
 	text-align: center;
 	margin-bottom: 10px;
 	margin-right: auto;
 	margin-left: auto;
+	color: #7bb5dd;
+	font-weight: bold;
 }
 .addfield_button:hover{
 	cursor:pointer;
@@ -107,13 +116,14 @@ html {
 
 /* Middle Pannel */
 .field_values_container{
-	padding: 20px 10px;
+	padding: 20px 30px;
 	height:100%;
 }
 
 .field_values{
 	border-right:1px solid #ccc;
 	height:100%;
+	padding-right: 30px;
 }
 
 /* Right Pannel */
@@ -122,10 +132,18 @@ html {
 	padding:10px 1px;
 }
 
+h4, .field_details{
+	display: inline-block;
+}
+
+.field_details{
+	margin-left:10px;
+}
+
 .object_block{
 	position: fixed;
 	background-color: #f1f1f1;
-	width:32%;
+	width:40%;
 	padding:10px;
 	max-height:500px;
 	overflow-y:scroll;

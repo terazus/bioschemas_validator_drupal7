@@ -43,10 +43,9 @@
 					<div class="field_selector col-lg-2"> 
 						<h3> Add fields from this menu </h3>
 						<div ng-repeat="item in creator.values" ng-show='tab.v1 === $index'> 
-							<div class="addfield_button" ng-repeat='field in item.fields' ng-click="$parent.$parent.tab.v2 = field"> {{field.field_name}} </div>
+							<div class="addfield_button" ng-repeat='field in item.fields track by $index' ng-click="$parent.$parent.tab.v2 = field"> {{field.field_name}} </div>
 						</div>
 					</div>
-
 
 
 					<div class="field_values_container col-lg-5"> 
@@ -54,20 +53,52 @@
 							<div> 
 								<div class="field_name">
 									<h4> Field name: </h4>
-									{{tab.v2.field_name}}
+									<div class="field_details">{{tab.v2.field_name}}</div>
+									<hr>
 								</div>
 								<div class="field_properties">
 									<h4> Field description: </h4> 
-									{{tab.v2.field_prop.description}}
+									<div class="field_details">{{tab.v2.description}}</div>
+									<hr>
 								</div>
-								<h4> Expected types: </h4>
-								<ul>
-									<div class="field_value" ng-repeat='field in tab'>
-										<div class="field_value" ng-repeat='test in field'>
-											 <li class="field_value" ng-repeat='test2 in test.oneOf'> {{test2.type}} </li>
+								<div class="field_types">
+									<h4> Expected types: </h4>
+									<ul>
+										<div class="field_value" ng-repeat='field in tab.v2.expected_types track by $index'>
+											<li class="field_value"> {{field}} </li>
 										</div>
-									</div>
-								<ul>
+									</ul>
+									<hr>
+								</div>
+								<div class="vocabulary" ng-show="tab.v2.vocabulary">
+									<h4> Controlled Vocabulary: </h4> 
+									<ul>
+										<div class="field_value" ng-repeat='field in tab.v2.vocabulary track by $index'>
+											<li class="field_value"> {{field}} </li>
+										</div>
+									</ul>
+									<hr>
+								</div>	
+								<div class="cardinality">
+									<h4> Multiple values allowed: </h4>
+									<div class="field_details" ng-show="tab.v2.cardinality===false"> No </div>
+									<div class="field_details" ng-show="tab.v2.cardinality===true"> Yes </div>
+									<hr>
+								</div>
+								<div class="presence">
+									<h4> State: </h4>
+									<div class="field_details">This field is {{tab.v2.state}} </div>
+									<hr>
+								</div>
+
+								<form id="form_{{$index}}">
+									<label><h4>Use the following form to add values to this field </h4></label><BR>
+									<input type="text" id="{{ 'input_' + tab.v2.field_name }}" ng-model="field"/>
+									<BR ng-show="tab.v2.cardinality===true">
+									<button class="add_more" ng-show="tab.v2.cardinality===true"> Add new values to this field </button>
+									<BR><button ng-click="tab.v2.fields = tab.v2.field_name + ':'" > Add field to your object </button>
+								</form>
+
 							</div>
 						</div>
 					</div>
@@ -79,8 +110,9 @@
 								<li class="list-group-item col-lg-6"> <h3>JSON-Code </h3> </li>
 							</ul>
 							<ul class="list-group row right_menu_details"> 
-								<li class="list-group-item"> The details of your object will appear here once you've started adding fields. You can navigate between the current object HTML view and the corresponding JSON-LD code by clicking to tabs at the top of this box. </li> 
+								<li class="list-group-item"> The details of your object will appear here once you've started adding fields. You can navigate between the current object HTML view and the corresponding JSON-LD code by clicking to tabs at the top of this box. </li>
 							</ul>
+							<pre>{{tab.v2.fields}}</pre> 
 						</div>
 					</div>
 				</div>

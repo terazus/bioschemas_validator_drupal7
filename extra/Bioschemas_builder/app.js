@@ -21,9 +21,57 @@
 			   	request.send(null);
 			   	var my_JSON_object = JSON.parse(request.responseText);
 			   	var fields = [];
-			   	for (name in my_JSON_object.properties){
-			   		fields.push({field_name : name, field_prop : my_JSON_object.properties[name]});
-			   		// start parsing and make the spec here!
+			   	for (name in my_JSON_object.properties) {
+			   		
+			   		var card = false;
+			   		var allowed = [];
+			   		var vocabulary = [];
+
+			   		var description = my_JSON_object.properties[name].description;
+
+			   		if (my_JSON_object.required.includes(name)){
+			   			var state = 'required';
+			   		}
+			   		else if (my_JSON_object.recommended.includes(name)){
+			   			var state = 'recommended';
+			   		}
+			   		else {
+			   			var state = 'optionnal';
+			   		}
+
+			   		
+			   		for (subkey in my_JSON_object.properties[name].oneOf){
+			   			if (typeof my_JSON_object.properties[name].oneOf[subkey].format != 'undefined'){
+			   				allowed.push(my_JSON_object.properties[name].oneOf[subkey].format);
+			   			}
+			   			if (my_JSON_object.properties[name].oneOf[subkey].type == 'array'){
+			   				card = true;
+			   			}
+			   			else if (my_JSON_object.properties[name].oneOf[subkey].type == 'string'){
+			   				if (!allowed.includes('string')){
+			   					allowed.push("string");
+			   				}
+			   			}
+			   			else if (my_JSON_object.properties[name].oneOf[subkey].type == 'object'){
+			   				for (allowed_object in my_JSON_object.properties[name].oneOf[subkey].properties.type.enum){
+			   					allowed.push( my_JSON_object.properties[name].oneOf[subkey].properties.type.enum[allowed_object]);
+			   				}
+			   			}
+			   			if (typeof my_JSON_object.properties[name].oneOf[subkey].enum == "object"){
+			   				vocabulary = my_JSON_object.properties[name].oneOf[subkey].enum;
+			   			}
+			   		}
+
+			   		if (vocabulary.length < 1){
+			   			vocabulary = false;
+			   		}
+			   		fields.push({field_name : name, 
+			   					field_prop : my_JSON_object.properties[name], 
+			   					cardinality: card,
+			   					description: description, 
+			   					expected_types: allowed,
+			   					vocabulary: vocabulary,
+			   					state: state});
 			   	}
 			   	values.push({name : object_name, fields : fields});
 			};
